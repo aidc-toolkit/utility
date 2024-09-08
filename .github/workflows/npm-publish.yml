@@ -16,8 +16,6 @@ jobs:
         with:
           node-version: 22
       - run: npm ci
-      - run: npm i @rollup/rollup-linux-x64-gnu
-      - run: npm test
 
   publish-npm:
     needs: build
