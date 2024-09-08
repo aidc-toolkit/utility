@@ -1,0 +1,10 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "extends": [
+    "@aidc-toolkit/dev/typedoc.json"
+  ],
+  "name": "Utility",
+  "entryPoints": [
+    "src/index.ts"
+  ]
+}
