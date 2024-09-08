@@ -16,6 +16,12 @@ jobs:
         with:
           node-version: 22
       - run: npm ci
+      # This is necessary to work around platform-specific optional dependencies bug (https://github.com/npm/cli/issues/4828).
+      # - run: npm i @rollup/rollup-linux-x64-gnu
+      # "vitest run" fails with:
+      # Error: failed to resolve "extends":"@aidc-toolkit/dev/tsconfig.json" in /home/runner/work/utility/utility/tsconfig.json
+      # Caused by: Error: Cannot find module '@aidc-toolkit/dev/tsconfig.json/tsconfig.json'
+      # - run: npm test
 
   publish-npm:
     needs: build
