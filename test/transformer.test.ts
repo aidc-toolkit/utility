@@ -1,9 +1,10 @@
-import {I18NEnvironment, i18nInit} from "@aidc-toolkit/core";
-import {describe, expect, test} from "vitest";
+import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
+import { describe, expect, test } from "vitest";
 import { EncryptionTransformer, IdentityTransformer, IterationHelper, Transformer } from "../src/index.js";
 
 await i18nInit(I18NEnvironment.CLI, true);
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 function testTransformer(domain: number, tweak?: number, callback?: (value: bigint, forwardValue: bigint) => void): void {
     const transformer = Transformer.get(domain, tweak);
 

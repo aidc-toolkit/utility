@@ -49,8 +49,6 @@ export class RecordValidator<T> implements StringValidator {
      *
      * @param key
      * Record key.
-     *
-     * @throws RangeError
      */
     validate(key: string): void {
         if (this.record[key] === undefined) {

@@ -182,8 +182,6 @@ export class CharacterSetValidator implements StringValidator {
      *
      * @param exclusion
      * Exclusion.
-     *
-     * @throws RangeError
      */
     protected validateExclusion(exclusion: Exclusion): void {
         if (exclusion !== Exclusion.None && !this._exclusionSupport.includes(exclusion)) {
@@ -203,8 +201,6 @@ export class CharacterSetValidator implements StringValidator {
      *
      * @param validation
      * Character set validation parameters.
-     *
-     * @throws RangeError
      */
     validate(s: string, validation?: CharacterSetValidation): void {
         const length = s.length;
@@ -452,8 +448,6 @@ export class CharacterSetCreator extends CharacterSetValidator {
      *
      * @returns
      * Shift required to skip all all-numeric strings.
-     *
-     * @throws RangeError
      */
     private allNumericShift(shiftForward: boolean, length: number, value: bigint): bigint {
         let shift: bigint;
@@ -495,8 +489,6 @@ export class CharacterSetCreator extends CharacterSetValidator {
      *
      * @param length
      * Length.
-     *
-     * @throws RangeError
      */
     private validateLength(length: number): void {
         if (length > CharacterSetCreator.MAXIMUM_STRING_LENGTH) {

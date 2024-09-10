@@ -115,8 +115,6 @@ export abstract class Transformer {
      *
      * @param count
      * Number of entries in the range to validate or 1 if undefined.
-     *
-     * @throws RangeError
      */
     private validate(startValue: bigint, count?: number): void {
         if (startValue < 0n) {
