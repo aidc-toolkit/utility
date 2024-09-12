@@ -1,4 +1,4 @@
-import { IterationHelper, type IterationSource } from "./iteration.js";
+import type { IterableOrIterator } from "./iteration.js";
 import i18next, { utilityNS } from "./locale/i18n.js";
 
 /**
@@ -257,7 +257,7 @@ export abstract class Transformer {
      * @returns
      * Iterable iterator over transformed values.
      */
-    forwardMultiple(valuesSource: IterationSource<bigint>): IterableIterator<bigint>;
+    forwardMultiple(valuesSource: IterableOrIterator<bigint>): IterableIterator<bigint>;
 
     /**
      * Transform multiple values forward.
@@ -274,10 +274,10 @@ export abstract class Transformer {
      * @returns
      * Iterable iterator over transformed values as defined by transformation callback.
      */
-    forwardMultiple<T>(valuesSource: IterationSource<bigint>, transformationCallback: TransformationCallback<T>): IterableIterator<T>;
+    forwardMultiple<T>(valuesSource: IterableOrIterator<bigint>, transformationCallback: TransformationCallback<T>): IterableIterator<T>;
 
-    forwardMultiple<T>(valuesSource: IterationSource<bigint>, transformationCallback?: TransformationCallback<T>): IterableIterator<bigint | T> {
-        return IterationHelper.from(valuesSource).map((value, index) => {
+    forwardMultiple<T>(valuesSource: IterableOrIterator<bigint>, transformationCallback?: TransformationCallback<T>): IterableIterator<bigint | T> {
+        return Iterator.from(valuesSource).map((value, index) => {
             this.validate(value);
 
             const transformedValue = this.doForward(value);

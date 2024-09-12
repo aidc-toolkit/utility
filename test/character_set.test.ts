@@ -6,7 +6,6 @@ import {
     CharacterSetCreator,
     Exclusion,
     HEXADECIMAL_CREATOR,
-    IterationHelper,
     NUMERIC_CREATOR
 } from "../src/index.js";
 
@@ -66,7 +65,7 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
                     break;
             }
 
-            const sequence = IterationHelper.from(characterSetCreator.createSequence(length, 0n, domain, exclusion));
+            const sequence = Iterator.from(characterSetCreator.createSequence(length, 0n, domain, exclusion));
 
             let previousS = "";
 
@@ -87,7 +86,7 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
 
             expect(() => characterSetCreator.create(length, domain, exclusion)).toThrow(RangeError);
 
-            const sparseSequence = IterationHelper.from(characterSetCreator.createSequence(length, 0n, domain, exclusion, 123456n));
+            const sparseSequence = Iterator.from(characterSetCreator.createSequence(length, 0n, domain, exclusion, 123456n));
 
             let sequential = true;
             previousS = "";

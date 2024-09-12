@@ -1,4 +1,4 @@
-import { IterationHelper, type IterationSource } from "./iteration.js";
+import type { IterableOrIterator } from "./iteration.js";
 import i18next, { utilityNS } from "./locale/i18n.js";
 import { RegExpValidator } from "./reg_exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
@@ -650,8 +650,8 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * Iterable iterator over created strings.
      */
-    createMultiple(length: number, valuesSource: IterationSource<number | bigint>, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): IterableIterator<string> {
-        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forwardMultiple(IterationHelper.from(valuesSource).map(value => BigInt(value)), transformationCallback));
+    createMultiple(length: number, valuesSource: IterableOrIterator<number | bigint>, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): IterableIterator<string> {
+        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forwardMultiple(Iterator.from(valuesSource).map(value => BigInt(value)), transformationCallback));
     }
 
     /**
