@@ -635,8 +635,8 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @param length
      * See {@link create}.
      *
-     * @param valuesSource
-     * Source of values.
+     * @param values
+     * Values.
      *
      * @param exclusion
      * See {@link create}.
@@ -650,8 +650,8 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * Iterable iterator over created strings.
      */
-    createMultiple(length: number, valuesSource: IterableOrIterator<number | bigint>, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): IterableIterator<string> {
-        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forwardMultiple(Iterator.from(valuesSource).map(value => BigInt(value)), transformationCallback));
+    createMultiple(length: number, values: IterableOrIterator<number | bigint>, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): IterableIterator<string> {
+        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forwardMultiple(Iterator.from(values).map(value => BigInt(value)), transformationCallback));
     }
 
     /**

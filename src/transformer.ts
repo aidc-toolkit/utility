@@ -52,15 +52,15 @@ export abstract class Transformer {
      * @param domain
      * Domain.
      */
-    constructor(domain: bigint) {
-        if (domain <= 0n) {
+    constructor(domain: number | bigint) {
+        this._domain = BigInt(domain);
+
+        if (this._domain <= 0n) {
             throw new RangeError(i18next.t("Transformer.domainMustBeGreaterThanZero", {
                 ns: utilityNS,
                 domain
             }));
         }
-
-        this._domain = BigInt(domain);
     }
 
     /**
@@ -155,7 +155,7 @@ export abstract class Transformer {
      * @returns
      * Transformed value.
      */
-    forward(value: bigint): bigint;
+    forward(value: number | bigint): bigint;
 
     /**
      * Transform a value forward.
@@ -172,12 +172,14 @@ export abstract class Transformer {
      * @returns
      * Value transformed into object.
      */
-    forward<T>(value: bigint, transformationCallback: TransformationCallback<T>): T;
+    forward<T>(value: number | bigint, transformationCallback: TransformationCallback<T>): T;
 
-    forward<T>(value: bigint, transformationCallback?: TransformationCallback<T>): bigint | T {
-        this.validate(value);
+    forward<T>(value: number | bigint, transformationCallback?: TransformationCallback<T>): bigint | T {
+        const valueN = BigInt(value);
+        
+        this.validate(valueN);
 
-        const transformedValue = this.doForward(value);
+        const transformedValue = this.doForward(valueN);
 
         return transformationCallback === undefined ? transformedValue : transformationCallback(transformedValue, 0);
     }
@@ -220,7 +222,7 @@ export abstract class Transformer {
      * @yields
      * Transformed value.
      */
-    forwardSequence(startValue: bigint, count: number): IterableIterator<bigint>;
+    forwardSequence(startValue: number | bigint, count: number): IterableIterator<bigint>;
 
     /**
      * Transform a sequence of values forward.
@@ -240,24 +242,26 @@ export abstract class Transformer {
      * @returns
      * Iterable iterator over transformed values as defined by transformation callback.
      */
-    forwardSequence<T>(startValue: bigint, count: number, transformationCallback: TransformationCallback<T>): IterableIterator<T>;
+    forwardSequence<T>(startValue: number | bigint, count: number, transformationCallback: TransformationCallback<T>): IterableIterator<T>;
 
-    forwardSequence<T>(startValue: bigint, count: number, transformationCallback?: TransformationCallback<T>): IterableIterator<bigint | T> {
-        this.validate(startValue, count);
+    forwardSequence<T>(startValue: number | bigint, count: number, transformationCallback?: TransformationCallback<T>): IterableIterator<bigint | T> {
+        const startValueN = BigInt(startValue);
+        
+        this.validate(startValueN, count);
 
-        return this.doForwardSequence(startValue, count, transformationCallback);
+        return this.doForwardSequence(startValueN, count, transformationCallback);
     }
 
     /**
      * Transform multiple values forward.
      *
-     * @param valuesSource
-     * Source of values.
+     * @param values
+     * Values.
      *
      * @returns
      * Iterable iterator over transformed values.
      */
-    forwardMultiple(valuesSource: IterableOrIterator<bigint>): IterableIterator<bigint>;
+    forwardMultiple(values: IterableOrIterator<number | bigint>): IterableIterator<bigint>;
 
     /**
      * Transform multiple values forward.
@@ -265,8 +269,8 @@ export abstract class Transformer {
      * @template T
      * Type returned by transformation callback or bigint if none.
      *
-     * @param valuesSource
-     * Source of values.
+     * @param values
+     * Values.
      *
      * @param transformationCallback
      * Transformation callback called after the value is transformed to convert it to its final value.
@@ -274,13 +278,15 @@ export abstract class Transformer {
      * @returns
      * Iterable iterator over transformed values as defined by transformation callback.
      */
-    forwardMultiple<T>(valuesSource: IterableOrIterator<bigint>, transformationCallback: TransformationCallback<T>): IterableIterator<T>;
+    forwardMultiple<T>(values: IterableOrIterator<number | bigint>, transformationCallback: TransformationCallback<T>): IterableIterator<T>;
 
-    forwardMultiple<T>(valuesSource: IterableOrIterator<bigint>, transformationCallback?: TransformationCallback<T>): IterableIterator<bigint | T> {
-        return Iterator.from(valuesSource).map((value, index) => {
-            this.validate(value);
+    forwardMultiple<T>(values: IterableOrIterator<number | bigint>, transformationCallback?: TransformationCallback<T>): IterableIterator<bigint | T> {
+        return Iterator.from(values).map((value, index) => {
+            const valueN = BigInt(value);
+            
+            this.validate(valueN);
 
-            const transformedValue = this.doForward(value);
+            const transformedValue = this.doForward(valueN);
 
             return transformationCallback !== undefined ? transformationCallback(transformedValue, index) : transformedValue;
         });
@@ -306,10 +312,12 @@ export abstract class Transformer {
      * @returns
      * Value.
      */
-    reverse(transformedValue: bigint): bigint {
-        this.validate(transformedValue);
+    reverse(transformedValue: number | bigint): bigint {
+        const transformedValueN = BigInt(transformedValue);
+        
+        this.validate(transformedValueN);
 
-        return this.doReverse(transformedValue);
+        return this.doReverse(transformedValueN);
     }
 }
 
@@ -400,7 +408,7 @@ export class EncryptionTransformer extends Transformer {
      * @param tweak
      * Tweak.
      */
-    constructor(domain: bigint, tweak: bigint) {
+    constructor(domain: number | bigint, tweak: number | bigint) {
         super(domain);
 
         if (tweak < 0n) {
@@ -413,19 +421,19 @@ export class EncryptionTransformer extends Transformer {
         let domainBytes = 0;
 
         // The number of bytes in the domain determines the size of the shuffle and xor operations.
-        for (let reducedDomainMinusOne = domain - 1n; reducedDomainMinusOne !== 0n; reducedDomainMinusOne = reducedDomainMinusOne >> 8n) {
+        for (let reducedDomainMinusOne = this.domain - 1n; reducedDomainMinusOne !== 0n; reducedDomainMinusOne = reducedDomainMinusOne >> 8n) {
             domainBytes++;
         }
 
         this._domainBytes = domainBytes;
-        this._tweak = tweak;
+        this._tweak = BigInt(tweak);
 
         const xorBytes = new Array<number>();
         const bits = new Array<number>();
         const inverseBits = new Array<number>();
 
         // Key is the product of domain, tweak, and an 8-digit prime to force at least four rounds.
-        for (let reducedKey = domain * tweak * 603868999n; reducedKey !== 0n; reducedKey = reducedKey >> 8n) {
+        for (let reducedKey = this.domain * this.tweak * 603868999n; reducedKey !== 0n; reducedKey = reducedKey >> 8n) {
             // Extract least-significant byte.
             const keyByte = Number(reducedKey & 0xFFn);
 
