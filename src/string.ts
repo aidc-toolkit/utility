@@ -8,7 +8,7 @@ export interface StringValidation {
 /**
  * String validator interface.
  */
-export interface StringValidator {
+export interface StringValidator<V extends StringValidation = StringValidation> {
     /**
      * Validate a string and throw an exception if validation fails.
      *
@@ -18,5 +18,5 @@ export interface StringValidator {
      * @param validation
      * String validation parameters.
      */
-    validate: (s: string, validation?: StringValidation) => void;
+    validate: (s: string, validation?: V) => void;
 }

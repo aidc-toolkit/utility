@@ -60,7 +60,7 @@ export interface CharacterSetValidation extends StringValidation {
 /**
  * Character set validator. Validates a string against a specified character set.
  */
-export class CharacterSetValidator implements StringValidator {
+export class CharacterSetValidator implements StringValidator<CharacterSetValidation> {
     private static readonly NOT_ALL_NUMERIC_VALIDATOR = new class extends RegExpValidator {
         protected override createErrorMessage(_s: string): string {
             return i18next.t("CharacterSetValidator.stringMustNotBeAllNumeric", {
@@ -591,7 +591,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * String created from the value.
      */
     create(length: number, value: number | bigint, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): string {
-        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forward(BigInt(value), transformationCallback));
+        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forward(value, transformationCallback));
     }
 
     /**
@@ -623,7 +623,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * Iterable iterator over created strings.
      */
     createSequence(length: number, startValue: number | bigint, count: number, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): IterableIterator<string> {
-        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forwardSequence(BigInt(startValue), count, transformationCallback));
+        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forwardSequence(startValue, count, transformationCallback));
     }
 
     /**
@@ -651,7 +651,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * Iterable iterator over created strings.
      */
     createMultiple(length: number, values: IterableOrIterator<number | bigint>, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): IterableIterator<string> {
-        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forwardMultiple(Iterator.from(values).map(value => BigInt(value)), transformationCallback));
+        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forwardMultiple(values, transformationCallback));
     }
 
     /**
