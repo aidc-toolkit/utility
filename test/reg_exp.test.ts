@@ -34,6 +34,7 @@ describe("Regular expression validator", () => {
     test("Error message", () => {
         expect(() => {
             new class extends RegExpValidator {
+                // eslint-disable-next-line jsdoc/require-jsdoc
                 protected override createErrorMessage(s: string): string {
                     return `Failed to validate "${s}"`;
                 }

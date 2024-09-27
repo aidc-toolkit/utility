@@ -50,6 +50,9 @@ export class RegExpValidator implements StringValidator {
         });
     }
 
+    /**
+     * @inheritDoc
+     */
     validate(s: string): void {
         if (!this._regExp.test(s)) {
             throw new RangeError(this.createErrorMessage(s));
