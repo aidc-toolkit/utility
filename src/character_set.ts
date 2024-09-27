@@ -182,7 +182,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * Component as a string or undefined.
      */
     private static componentToString(component: string | (() => string) | undefined): string | undefined {
-        return component === undefined || typeof component === "string" ? component : component();
+        return typeof component === "function" ? component() : component;
     }
 
     /**
