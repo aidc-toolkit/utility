@@ -2,7 +2,7 @@ import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
 import {
     ALPHABETIC_CREATOR,
-    ALPHANUMERIC_CREATOR,
+    ALPHANUMERIC_CREATOR, Sequencer,
     CharacterSetCreator,
     Exclusion,
     HEXADECIMAL_CREATOR,
@@ -65,7 +65,7 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
                     break;
             }
 
-            const sequence = Iterator.from(characterSetCreator.createSequence(length, 0n, domain, exclusion));
+            const sequence = Iterator.from(characterSetCreator.create(length, new Sequencer(0n, domain), exclusion));
 
             let previousS = "";
 
@@ -77,26 +77,26 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
 
                 expect(s.length).toBe(length);
 
-                expect(characterSetCreator.value(s, exclusion)).toBe(BigInt(index));
+                expect(characterSetCreator.valueFor(s, exclusion)).toBe(BigInt(index));
 
                 sequenceCount++;
             });
 
             expect(sequenceCount).toBe(domain);
 
-            expect(() => characterSetCreator.create(length, domain, exclusion)).toThrow(RangeError);
+            expect(() => characterSetCreator.create(length, domain, exclusion)).toThrow(`Value ${domain} must be less than ${domain}`);
 
-            const sparseSequence = Iterator.from(characterSetCreator.createSequence(length, 0n, domain, exclusion, 123456n));
+            const sparseSequence = Iterator.from(characterSetCreator.create(length, new Sequencer(domain - 1, -domain), exclusion, 123456n));
 
             let sequential = true;
-            previousS = "";
+            previousS = "~";
 
             const sequenceSet = new Set<string>();
 
             sequenceCount = 0;
 
             sparseSequence.forEach((s, index) => {
-                sequential = sequential && s > previousS;
+                sequential = sequential && s < previousS;
                 previousS = s;
 
                 expect(s.length).toBe(length);
@@ -104,7 +104,7 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
                 expect(sequenceSet.has(s)).toBe(false);
                 sequenceSet.add(s);
 
-                expect(characterSetCreator.value(s, exclusion, 123456n)).toBe(BigInt(index));
+                expect(characterSetCreator.valueFor(s, exclusion, 123456n)).toBe(BigInt(domain - index - 1));
 
                 sequenceCount++;
             });
@@ -124,11 +124,18 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
                 sparseRandomValues.push(characterSetCreator.create(length, randomValue, exclusion, 123456n));
             }
 
-            expect(Array.from(characterSetCreator.createMultiple(length, randomValues, exclusion))).toStrictEqual(straightRandomValues);
-            expect(Array.from(characterSetCreator.createMultiple(length, randomValues, exclusion, 123456n))).toStrictEqual(sparseRandomValues);
+            expect(Array.from(characterSetCreator.create(length, randomValues, exclusion))).toStrictEqual(straightRandomValues);
+            expect(Array.from(characterSetCreator.create(length, randomValues, exclusion, 123456n))).toStrictEqual(sparseRandomValues);
 
-            expect(() => characterSetCreator.create(length, exclusion, domain, 123456n)).toThrow(RangeError);
+            expect(() => characterSetCreator.create(length, domain, exclusion, 123456n)).toThrow(`Value ${domain} must be less than ${domain}`);
         }
+
+        test("Length", () => {
+            expect(() => characterSetCreator.create(0, 0)).not.toThrow(RangeError);
+            expect(() => characterSetCreator.create(-1, 0)).toThrow("Length -1 must be greater than or equal to 0");
+            expect(() => characterSetCreator.create(40, 0)).not.toThrow(RangeError);
+            expect(() => characterSetCreator.create(41, 0)).toThrow("Length 41 must be less than or equal to 40");
+        });
 
         test("Create sequence", () => {
             testCreate(Exclusion.None);
@@ -138,8 +145,8 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
             test("Create sequence, exclude first zero", () => {
                 testCreate(Exclusion.FirstZero);
 
-                expect(() => characterSetCreator.value("0000", Exclusion.FirstZero)).toThrow(RangeError);
-                expect(() => characterSetCreator.value("1000", Exclusion.FirstZero)).not.toThrow(RangeError);
+                expect(() => characterSetCreator.valueFor("0000", Exclusion.FirstZero)).toThrow("Invalid character '0' at position 1");
+                expect(() => characterSetCreator.valueFor("1000", Exclusion.FirstZero)).not.toThrow(RangeError);
             });
         }
 
@@ -147,12 +154,12 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
             test("Create sequence, exclude all numeric", () => {
                 testCreate(Exclusion.AllNumeric);
 
-                expect(() => characterSetCreator.value("0000", Exclusion.AllNumeric)).toThrow(RangeError);
+                expect(() => characterSetCreator.valueFor("0000", Exclusion.AllNumeric)).toThrow("String must not be all numeric");
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                expect(() => characterSetCreator.value("000" + characterSetCreator.character(characterSetCreator.characterIndex("9")! + 1), Exclusion.AllNumeric)).not.toThrow(RangeError);
-                expect(() => characterSetCreator.value("9999", Exclusion.AllNumeric)).toThrow(RangeError);
+                expect(() => characterSetCreator.valueFor("000" + characterSetCreator.character(characterSetCreator.characterIndex("9")! + 1), Exclusion.AllNumeric)).not.toThrow(RangeError);
+                expect(() => characterSetCreator.valueFor("9999", Exclusion.AllNumeric)).toThrow("String must not be all numeric");
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                expect(() => characterSetCreator.value("999" + characterSetCreator.character(characterSetCreator.characterIndex("9")! + 1), Exclusion.AllNumeric)).not.toThrow(RangeError);
+                expect(() => characterSetCreator.valueFor("999" + characterSetCreator.character(characterSetCreator.characterIndex("9")! + 1), Exclusion.AllNumeric)).not.toThrow(RangeError);
             });
         }
     });

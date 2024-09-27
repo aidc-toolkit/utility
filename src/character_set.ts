@@ -1,8 +1,7 @@
-import type { IterableOrIterator } from "./iteration.js";
 import i18next, { utilityNS } from "./locale/i18n.js";
 import { RegExpValidator } from "./reg_exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
-import { type TransformationCallback, Transformer } from "./transformer.js";
+import { Transformer } from "./transformer.js";
 
 /**
  * Exclusion options for validating and creating strings based on character sets.
@@ -62,6 +61,15 @@ export interface CharacterSetValidation extends StringValidation {
  */
 export class CharacterSetValidator implements StringValidator<CharacterSetValidation> {
     private static readonly NOT_ALL_NUMERIC_VALIDATOR = new class extends RegExpValidator {
+        /**
+         * Create an error message for an all-numeric string.
+         *
+         * @param _s
+         * String.
+         *
+         * @returns
+         * Error message.
+         */
         protected override createErrorMessage(_s: string): string {
             return i18next.t("CharacterSetValidator.stringMustNotBeAllNumeric", {
                 ns: utilityNS
@@ -491,6 +499,14 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * Length.
      */
     private validateLength(length: number): void {
+        if (length < 0) {
+            throw new RangeError(i18next.t("CharacterSetValidator.lengthMustBeGreaterThanOrEqualTo", {
+                ns: utilityNS,
+                length,
+                minimumLength: 0
+            }));
+        }
+
         if (length > CharacterSetCreator.MAXIMUM_STRING_LENGTH) {
             throw new RangeError(i18next.t("CharacterSetValidator.lengthMustBeLessThanOrEqualTo", {
                 ns: utilityNS,
@@ -501,31 +517,97 @@ export class CharacterSetCreator extends CharacterSetValidator {
     }
 
     /**
-     * Do the work for the creation methods. Undocumented parameters are as defined in the public methods.
-     *
-     * @template T
-     * Type defined by creation callback to do the work of creation (string or string[]).
+     * Create a string by mapping a value to the equivalent characters in the character set across the length of the
+     * string.
      *
      * @param length
-     * See public methods.
+     * Required string length.
+     *
+     * @param value
+     * Numeric value of the string.
      *
      * @param exclusion
-     * See public methods.
+     * Strings to be excluded from the range of outputs. See {@link Exclusion} for possible values and their meaning.
      *
      * @param tweak
-     * See public methods.
+     * If provided, the numerical value of the string is "tweaked" using an {@link EncryptionTransformer | encryption
+     * transformer}.
      *
      * @param creationCallback
-     * See public methods.
-     *
-     * @param createCallback
-     * Callback to do the work of creation, whether for a single value or a sequence. Called with the appropriate
-     * transformer and a transformation callback method to map individual transformed values to strings.
+     * If provided, called after the string is constructed to create the final value.
      *
      * @returns
-     * Created string or iterable iterator over created strings.
+     * String created from the value.
      */
-    private doCreate<T>(length: number, exclusion: Exclusion, tweak: number | bigint | undefined, creationCallback: CreationCallback | undefined, createCallback: (transformer: Transformer, transformationCallback: TransformationCallback<string>) => T): T {
+    create(length: number, value: number | bigint, exclusion?: Exclusion, tweak?: number | bigint, creationCallback?: CreationCallback): string;
+
+    /**
+     * Create multiple strings by mapping each value to the equivalent characters in the character set across the length
+     * of the string. Equivalent to calling this method for each individual value.
+     *
+     * @param length
+     * Required string length.
+     *
+     * @param values
+     * Numeric values of the strings.
+     *
+     * @param exclusion
+     * Strings to be excluded from the range of outputs. See {@link Exclusion} for possible values and their meaning.
+     *
+     * @param tweak
+     * If provided, the numerical value of the strings are "tweaked" using an {@link EncryptionTransformer | encryption
+     * transformer}.
+     *
+     * @param creationCallback
+     * If provided, called after each string is constructed to create the final value.
+     *
+     * @returns
+     * Iterable iterator over strings created from the values.
+     */
+    create(length: number, values: Iterable<number | bigint>, exclusion?: Exclusion, tweak?: number | bigint, creationCallback?: CreationCallback): IterableIterator<string>;
+
+    /**
+     * Create a string or multiple strings. This signature exists to allow similar overloaded methods in other classes
+     * to call this method correctly.
+     *
+     * @param length
+     *
+     * @param valueOrValues
+     *
+     * @param exclusion
+     *
+     * @param tweak
+     *
+     * @param creationCallback
+     *
+     * @returns
+     */
+    create(length: number, valueOrValues: number | bigint | Iterable<number | bigint>, exclusion?: Exclusion, tweak?: number | bigint, creationCallback?: CreationCallback): string | IterableIterator<string>;
+
+    /**
+     * Create a string or multiple strings by mapping each value to the equivalent characters in the character set
+     * across the length of the string.
+     *
+     * @param length
+     * Required string length.
+     *
+     * @param valueOrValues
+     * Numeric value(s) of the string(s).
+     *
+     * @param exclusion
+     * String(s) to be excluded from the range of outputs. See {@link Exclusion} for possible values and their meaning.
+     *
+     * @param tweak
+     * If provided, the numerical value of the string(s) is/are "tweaked" using an {@link EncryptionTransformer |
+     * encryption transformer}.
+     *
+     * @param creationCallback
+     * If provided, called after the string(s) is/are constructed to create the final value.
+     *
+     * @returns
+     * String or iterable iterator over strings created from the value(s).
+     */
+    create(length: number, valueOrValues: number | bigint | Iterable<number | bigint>, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): string | IterableIterator<string> {
         this.validateLength(length);
         this.validateExclusion(exclusion);
 
@@ -535,7 +617,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transformer = Transformer.get(this._exclusionDomains[exclusion]![length], tweak);
 
-        return createCallback(transformer, (transformedValue, index) => {
+        return transformer.forward(valueOrValues, (transformedValue, index) => {
             let s = "";
 
             // Empty string is valid.
@@ -568,93 +650,6 @@ export class CharacterSetCreator extends CharacterSetValidator {
     }
 
     /**
-     * Create a string by mapping a value to the equivalent characters in the character set across the length of the
-     * string.
-     *
-     * @param length
-     * Required string length.
-     *
-     * @param value
-     * Numeric value of the string.
-     *
-     * @param exclusion
-     * Strings to be excluded from the range of outputs. See {@link Exclusion} for possible values and their meaning.
-     *
-     * @param tweak
-     * If provided, the numerical value of the string is "tweaked" using an {@link EncryptionTransformer | encryption
-     * transformer}.
-     *
-     * @param creationCallback
-     * If provided, called after the string is constructed to create the final value.
-     *
-     * @returns
-     * String created from the value.
-     */
-    create(length: number, value: number | bigint, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): string {
-        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forward(value, transformationCallback));
-    }
-
-    /**
-     * Create a sequence of strings by mapping each value to the equivalent characters in the character set across the
-     * length of the string. Equivalent to calling {@link create} for `value = startValue + n` where `n` ranges from `0`
-     * to `count - 1`.
-     *
-     * The implementation uses {@link Transformer.forwardSequence}, so the values are created only as needed.
-     *
-     * @param length
-     * See {@link create}.
-     *
-     * @param startValue
-     * Numeric value of the first string. Strings are created from `startValue` to `startValue + count - 1`.
-     *
-     * @param count
-     * The number of strings to create.
-     *
-     * @param exclusion
-     * See {@link create}.
-     *
-     * @param tweak
-     * See {@link create}.
-     *
-     * @param creationCallback
-     * See {@link create}.
-     *
-     * @returns
-     * Iterable iterator over created strings.
-     */
-    createSequence(length: number, startValue: number | bigint, count: number, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): IterableIterator<string> {
-        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forwardSequence(startValue, count, transformationCallback));
-    }
-
-    /**
-     * Create multiple strings by mapping each value to the equivalent characters in the character set across the length
-     * of the string. Equivalent to calling {@link create} for each value in the values source.
-     *
-     * The implementation uses {@link Transformer.forwardMultiple}, so the values are created only as needed.
-     *
-     * @param length
-     * See {@link create}.
-     *
-     * @param values
-     * Values.
-     *
-     * @param exclusion
-     * See {@link create}.
-     *
-     * @param tweak
-     * See {@link create}.
-     *
-     * @param creationCallback
-     * See {@link create}.
-     *
-     * @returns
-     * Iterable iterator over created strings.
-     */
-    createMultiple(length: number, values: IterableOrIterator<number | bigint>, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): IterableIterator<string> {
-        return this.doCreate(length, exclusion, tweak, creationCallback, (transformer, transformationCallback) => transformer.forwardMultiple(values, transformationCallback));
-    }
-
-    /**
      * Determine the value for a string.
      *
      * @param s
@@ -670,7 +665,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * Numeric value of the string.
      */
-    value(s: string, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint): bigint {
+    valueFor(s: string, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint): bigint {
         const length = s.length;
 
         this.validateLength(length);

@@ -2,10 +2,10 @@ export const localeStrings = {
     Transformer: {
         domainMustBeGreaterThanZero: "Domain {{domain}} must be greater than 0",
         tweakMustBeGreaterThanOrEqualToZero: "Tweak {{tweak}} must be greater than or equal to 0",
-        valueMustBeGreaterThanOrEqualToZero: "Value {{startValue}} must be greater than or equal to 0",
-        startValueMustBeGreaterThanOrEqualToZero: "Start value {{startValue}} must be greater than or equal to 0",
-        valueMustBeLessThan: "Value {{endValue}} must be less than {{domain}}",
-        endValueMustBeLessThan: "End value (start value + count - 1) {{endValue}} must be less than {{domain}}"
+        valueMustBeGreaterThanOrEqualToZero: "Value {{value}} must be greater than or equal to 0",
+        valueMustBeLessThan: "Value {{value}} must be less than {{domain}}",
+        minValueMustBeGreaterThanOrEqualToZero: "Minimum value {{minValue}} must be greater than or equal to 0",
+        maxValueMustBeLessThan: "Maximum value {{maxValue}} must be less than {{domain}}"
     },
     RegExpValidator: {
         stringDoesNotMatchPattern: "String {{s}} does not match pattern"

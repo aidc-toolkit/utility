@@ -1,6 +1,6 @@
 import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { EncryptionTransformer, IdentityTransformer, Transformer } from "../src/index.js";
+import { Sequencer, EncryptionTransformer, IdentityTransformer, Transformer } from "../src/index.js";
 
 await i18nInit(I18NEnvironment.CLI, true);
 
@@ -12,7 +12,7 @@ function testTransformer(domain: number, tweak?: number, callback?: (value: bigi
 
     const transformedValuesSet = new Set<bigint>();
 
-    Iterator.from(transformer.forwardSequence(0n, domain)).forEach((transformedValue, index) => {
+    Iterator.from(transformer.forward(new Sequencer(0n, domain))).forEach((transformedValue, index) => {
         const indexN = BigInt(index);
 
         if (sequential && transformedValue !== indexN) {
@@ -41,12 +41,14 @@ function testTransformer(domain: number, tweak?: number, callback?: (value: bigi
         transformedRandomValues.push(transformer.forward(randomValue));
     }
 
-    expect(Array.from(transformer.forwardMultiple(randomValues))).toStrictEqual(transformedRandomValues);
+    expect(Array.from(transformer.forward(randomValues))).toStrictEqual(transformedRandomValues);
 
-    expect(() => transformer.forward(BigInt(domain))).toThrow(`Value ${domain} must be less than ${domain}`);
-    expect(() => transformer.forwardSequence(BigInt(domain), 0)).not.toThrow(RangeError);
-    expect(() => transformer.forwardSequence(BigInt(domain) - 1n, 1)).not.toThrow(RangeError);
-    expect(() => transformer.forwardSequence(BigInt(domain), 1)).toThrow(`End value (start value + count - 1) ${domain} must be less than ${domain}`);
+    expect(() => transformer.forward(domain)).toThrow(`Value ${domain} must be less than ${domain}`);
+    expect(() => transformer.forward(new Sequencer(domain, 0))).not.toThrow(RangeError);
+    expect(() => transformer.forward(new Sequencer(domain - 1, 1))).not.toThrow(RangeError);
+    expect(() => transformer.forward(new Sequencer(domain, 1))).toThrow(`Maximum value ${domain} must be less than ${domain}`);
+    expect(() => transformer.forward(new Sequencer(0, -1))).not.toThrow(RangeError);
+    expect(() => transformer.forward(new Sequencer(-1, -1))).toThrow("Minimum value -1 must be greater than or equal to 0");
 }
 
 describe("Identity", () => {
@@ -132,7 +134,7 @@ describe("Encryption", () => {
     });
 
     test("Tweak variation", () => {
-        expect(Array.from(Transformer.get(1000, 1235).forwardSequence(0n, 1000))).not.toStrictEqual(Array.from(Transformer.get(1000, 1234).forwardSequence(0n, 1000)));
+        expect(Array.from(Transformer.get(1000, 1235).forward(new Sequencer(0n, 1000)))).not.toStrictEqual(Array.from(Transformer.get(1000, 1234).forward(new Sequencer(0n, 1000))));
     });
 
     test("Consistency", () => {
