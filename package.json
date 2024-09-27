@@ -20,7 +20,8 @@
   },
   "scripts": {
     "eslint": "eslint .",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup src/index.ts --clean --format cjs,esm --dts",
+    "build-dev": "npm run build && tsc src/index.ts --outDir dist --target esnext --moduleResolution nodenext --module nodenext --emitDeclarationOnly --declaration --declarationMap",
     "test": "vitest run"
   },
   "devDependencies": {
