@@ -6,5 +6,6 @@
   "name": "Utility",
   "entryPoints": [
     "src/index.ts"
-  ]
+  ],
+  "gitRevision": "main"
 }
