@@ -584,29 +584,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      */
     create(length: number, valueOrValues: number | bigint | Iterable<number | bigint>, exclusion?: Exclusion, tweak?: number | bigint, creationCallback?: CreationCallback): string | IterableIterator<string>;
 
-    /**
-     * Create a string or multiple strings by mapping each value to the equivalent characters in the character set
-     * across the length of the string.
-     *
-     * @param length
-     * Required string length.
-     *
-     * @param valueOrValues
-     * Numeric value(s) of the string(s).
-     *
-     * @param exclusion
-     * String(s) to be excluded from the range of outputs. See {@link Exclusion} for possible values and their meaning.
-     *
-     * @param tweak
-     * If provided, the numerical value of the string(s) is/are "tweaked" using an {@link EncryptionTransformer |
-     * encryption transformer}.
-     *
-     * @param creationCallback
-     * If provided, called after the string(s) is/are constructed to create the final value.
-     *
-     * @returns
-     * String or iterable iterator over strings created from the value(s).
-     */
+    // eslint-disable-next-line jsdoc/require-jsdoc
     create(length: number, valueOrValues: number | bigint | Iterable<number | bigint>, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): string | IterableIterator<string> {
         this.validateLength(length);
         this.validateExclusion(exclusion);
