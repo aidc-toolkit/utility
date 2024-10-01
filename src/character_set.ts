@@ -28,29 +28,29 @@ export enum Exclusion {
  */
 export interface CharacterSetValidation extends StringValidation {
     /**
-     * Minimum length. If defined and the string is less than this length, an exception is thrown.
+     * Minimum length. If defined and the string is less than this length, an error is thrown.
      */
     minimumLength?: number | undefined;
 
     /**
-     * Maximum length. If defined and the string is greater than this length, an exception is thrown.
+     * Maximum length. If defined and the string is greater than this length, an error is thrown.
      */
     maximumLength?: number | undefined;
 
     /**
-     * Exclusion from the string. If defined and the string is within the exclusion range, an exception is thrown.
+     * Exclusion from the string. If defined and the string is within the exclusion range, an error is thrown.
      */
     exclusion?: Exclusion | undefined;
 
     /**
      * Position offset within a larger string. Strings are sometimes composed of multiple substrings; this parameter
-     * ensures that the exception notes the proper position in the string.
+     * ensures that the error notes the proper position in the string.
      */
     positionOffset?: number | undefined;
 
     /**
      * Name of component, typically but not exclusively within a larger string. This parameter ensure that the
-     * exception notes the component that triggered it. Value may be a string or a callback that returns a string, the
+     * error notes the component that triggered it. Value may be a string or a callback that returns a string, the
      * latter allowing for localization changes.
      */
     component?: string | (() => string) | undefined;
@@ -186,7 +186,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
     }
 
     /**
-     * Validate that an exclusion is supported. If not, an exception is thrown.
+     * Validate that an exclusion is supported. If not, an error is thrown.
      *
      * @param exclusion
      * Exclusion.
@@ -202,7 +202,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
 
     /**
      * Validate a string. If the string violates the character set or any of the character set validation parameters, an
-     * exception is thrown.
+     * error is thrown.
      *
      * @param s
      * String.
@@ -493,7 +493,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
     }
 
     /**
-     * Validate that a length is less than or equal to {@link MAXIMUM_STRING_LENGTH}. If not, an exception is thrown.
+     * Validate that a length is less than or equal to {@link MAXIMUM_STRING_LENGTH}. If not, an error is thrown.
      *
      * @param length
      * Length.

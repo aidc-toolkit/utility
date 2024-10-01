@@ -2,8 +2,8 @@ import i18next, { utilityNS } from "./locale/i18n.js";
 import type { StringValidator } from "./string.js";
 
 /**
- * Record validator. Validation is performed against a record with a string key type and throws an exception if the key
- * is not found.
+ * Record validator. Validation is performed against a record with a string key type and throws an error if the key is
+ * not found.
  */
 export class RecordValidator<T> implements StringValidator {
     /**
