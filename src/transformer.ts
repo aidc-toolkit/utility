@@ -513,9 +513,7 @@ export class EncryptionTransformer extends Transformer {
      * Value.
      */
     private static bytesToValue(bytes: Uint8Array): bigint {
-        return bytes.reduce((accumulator, byte) => {
-            return accumulator << 8n | BigInt(byte);
-        }, 0n);
+        return bytes.reduce((accumulator, byte) => accumulator << 8n | BigInt(byte), 0n);
     }
 
     /**
