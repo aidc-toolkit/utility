@@ -154,12 +154,13 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
             test("Create sequence, exclude all numeric", () => {
                 testCreate(Exclusion.AllNumeric);
 
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Nine is known to be present in the character set.
+                const afterNine = characterSetCreator.character(characterSetCreator.characterIndex("9")! + 1);
+
                 expect(() => characterSetCreator.valueFor("0000", Exclusion.AllNumeric)).toThrow("String must not be all numeric");
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Nine is known to be present in the character set.
-                expect(() => characterSetCreator.valueFor("000" + characterSetCreator.character(characterSetCreator.characterIndex("9")! + 1), Exclusion.AllNumeric)).not.toThrow(RangeError);
+                expect(() => characterSetCreator.valueFor(`000${afterNine}`, Exclusion.AllNumeric)).not.toThrow(RangeError);
                 expect(() => characterSetCreator.valueFor("9999", Exclusion.AllNumeric)).toThrow("String must not be all numeric");
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Nine is known to be present in the character set.
-                expect(() => characterSetCreator.valueFor("999" + characterSetCreator.character(characterSetCreator.characterIndex("9")! + 1), Exclusion.AllNumeric)).not.toThrow(RangeError);
+                expect(() => characterSetCreator.valueFor(`999${afterNine}`, Exclusion.AllNumeric)).not.toThrow(RangeError);
             });
         }
     });
