@@ -4,7 +4,7 @@ import { Sequencer, EncryptionTransformer, IdentityTransformer, Transformer } fr
 
 await i18nInit(I18NEnvironment.CLI, true);
 
-// eslint-disable-next-line jsdoc/require-jsdoc
+// eslint-disable-next-line jsdoc/require-jsdoc -- No JSDoc in test files.
 function testTransformer(domain: number, tweak?: number, callback?: (value: bigint, forwardValue: bigint) => void): void {
     const transformer = Transformer.get(domain, tweak);
 
@@ -120,13 +120,13 @@ describe("Encryption", () => {
     });
 
     test("Byte boundary", () => {
-        // eslint-disable-next-line @typescript-eslint/dot-notation
+        // eslint-disable-next-line @typescript-eslint/dot-notation -- Need access to private attribute.
         expect((Transformer.get(256n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(1);
-        // eslint-disable-next-line @typescript-eslint/dot-notation
+        // eslint-disable-next-line @typescript-eslint/dot-notation -- Need access to private attribute.
         expect((Transformer.get(257n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(2);
-        // eslint-disable-next-line @typescript-eslint/dot-notation
+        // eslint-disable-next-line @typescript-eslint/dot-notation -- Need access to private attribute.
         expect((Transformer.get(65536n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(2);
-        // eslint-disable-next-line @typescript-eslint/dot-notation
+        // eslint-disable-next-line @typescript-eslint/dot-notation -- Need access to private attribute.
         expect((Transformer.get(65537n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(3);
 
         testTransformer(256, 1);

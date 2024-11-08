@@ -402,7 +402,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
             exclusionAllNumericDomains = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
 
             // Zero index is the all-zero value for a single-character string.
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Zero is known to be present in the character set.
             const zeroIndex = BigInt(this.characterIndex("0")!);
 
             const allZerosValues = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
@@ -438,7 +438,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * `characterSetSize**power`.
      */
     private powerOfSize(power: number): bigint {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Exclusion.None is always present.
         return this._exclusionDomains[Exclusion.None]![power];
     }
 
@@ -584,15 +584,15 @@ export class CharacterSetCreator extends CharacterSetValidator {
      */
     create(length: number, valueOrValues: number | bigint | Iterable<number | bigint>, exclusion?: Exclusion, tweak?: number | bigint, creationCallback?: CreationCallback): string | IterableIterator<string>;
 
-    // eslint-disable-next-line jsdoc/require-jsdoc
+    // eslint-disable-next-line jsdoc/require-jsdoc -- Implementation of overloaded signatures.
     create(length: number, valueOrValues: number | bigint | Iterable<number | bigint>, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): string | IterableIterator<string> {
         this.validateLength(length);
         this.validateExclusion(exclusion);
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- All-zeros values is known to be defined for all-numeric exclusion.
         const allZerosValue = exclusion === Exclusion.AllNumeric ? this._allZerosValues![length] : undefined;
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Exclusion is valid so exclusion domain at index is valid.
         const transformer = Transformer.get(this._exclusionDomains[exclusion]![length], tweak);
 
         return transformer.forward(valueOrValues, (transformedValue, index) => {
@@ -602,10 +602,10 @@ export class CharacterSetCreator extends CharacterSetValidator {
             if (length !== 0) {
                 let convertValue = transformedValue;
 
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- All-zeros value is known to be defined for all-numeric exclusion.
                 if (exclusion === Exclusion.AllNumeric && convertValue >= allZerosValue!) {
                     // Value to convert is shifted by the number of all-numeric strings that occur at or prior to it.
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- All-zeros value is known to be defined for all-numeric exclusion.
                     convertValue = convertValue + this.allNumericShift(true, length, convertValue - allZerosValue!);
                 }
 
@@ -682,7 +682,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
         }, 0n);
 
         if (exclusion === Exclusion.AllNumeric) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- All-zeros values is known to be defined for all-numeric exclusion.
             const allZerosValue = this._allZerosValues![length];
 
             if (value >= allZerosValue) {
@@ -691,7 +691,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
             }
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Exclusion is valid so exclusion domain at index is valid.
         return Transformer.get(this._exclusionDomains[exclusion]![length], tweak).reverse(value);
     }
 }

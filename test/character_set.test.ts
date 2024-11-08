@@ -11,7 +11,7 @@ import {
 
 await i18nInit(I18NEnvironment.CLI, true);
 
-// eslint-disable-next-line jsdoc/require-jsdoc
+// eslint-disable-next-line jsdoc/require-jsdoc -- No JSDoc in test files.
 function testCharacterSetCreator(name: string, characterSetCreator: CharacterSetCreator, characterSetSize: number, length: number, excludeFirstZero: boolean, excludeAllNumeric: boolean): void {
     describe(name, () => {
         test("Character set", () => {
@@ -45,7 +45,7 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
             expect(characterSetCreator.exclusionSupport.includes(Exclusion.AllNumeric)).toBe(excludeAllNumeric);
         });
 
-        // eslint-disable-next-line jsdoc/require-jsdoc
+        // eslint-disable-next-line jsdoc/require-jsdoc -- No JSDoc in test files.
         function testCreate(exclusion: Exclusion): void {
             let domain: number;
 
@@ -155,10 +155,10 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
                 testCreate(Exclusion.AllNumeric);
 
                 expect(() => characterSetCreator.valueFor("0000", Exclusion.AllNumeric)).toThrow("String must not be all numeric");
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Nine is known to be present in the character set.
                 expect(() => characterSetCreator.valueFor("000" + characterSetCreator.character(characterSetCreator.characterIndex("9")! + 1), Exclusion.AllNumeric)).not.toThrow(RangeError);
                 expect(() => characterSetCreator.valueFor("9999", Exclusion.AllNumeric)).toThrow("String must not be all numeric");
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Nine is known to be present in the character set.
                 expect(() => characterSetCreator.valueFor("999" + characterSetCreator.character(characterSetCreator.characterIndex("9")! + 1), Exclusion.AllNumeric)).not.toThrow(RangeError);
             });
         }
