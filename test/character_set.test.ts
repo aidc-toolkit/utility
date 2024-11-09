@@ -2,16 +2,16 @@ import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
 import {
     ALPHABETIC_CREATOR,
-    ALPHANUMERIC_CREATOR, Sequencer,
+    ALPHANUMERIC_CREATOR,
     CharacterSetCreator,
     Exclusion,
     HEXADECIMAL_CREATOR,
-    NUMERIC_CREATOR
+    NUMERIC_CREATOR,
+    Sequencer
 } from "../src/index.js";
 
 await i18nInit(I18NEnvironment.CLI, true);
 
-// eslint-disable-next-line jsdoc/require-jsdoc -- No JSDoc in test files.
 function testCharacterSetCreator(name: string, characterSetCreator: CharacterSetCreator, characterSetSize: number, length: number, excludeFirstZero: boolean, excludeAllNumeric: boolean): void {
     describe(name, () => {
         test("Character set", () => {
@@ -45,7 +45,6 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
             expect(characterSetCreator.exclusionSupport.includes(Exclusion.AllNumeric)).toBe(excludeAllNumeric);
         });
 
-        // eslint-disable-next-line jsdoc/require-jsdoc -- No JSDoc in test files.
         function testCreate(exclusion: Exclusion): void {
             let domain: number;
 
@@ -165,6 +164,29 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
         }
     });
 }
+
+describe("Exclusion", () => {
+    test("First zero", () => {
+        expect(() => new CharacterSetCreator([
+            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+        ], Exclusion.FirstZero)).not.toThrow(RangeError);
+        expect(() => new CharacterSetCreator([
+            "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"
+        ], Exclusion.FirstZero)).toThrow("Character set must support zero as first character");
+    });
+
+    test("All numeric", () => {
+        expect(() => new CharacterSetCreator([
+            "!", "#", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D"
+        ], Exclusion.AllNumeric)).not.toThrow(RangeError);
+        expect(() => new CharacterSetCreator([
+            "!", "#", "/", "0", "1", "2", "3", "A", "B", "C", "D"
+        ], Exclusion.AllNumeric)).toThrow("Character set must support all numeric characters in sequence");
+        expect(() => new CharacterSetCreator([
+            "!", "#", "/", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D"
+        ], Exclusion.AllNumeric)).toThrow("Character set must support all numeric characters in sequence");
+    });
+});
 
 testCharacterSetCreator("Numeric", NUMERIC_CREATOR, 10, 4, true, false);
 testCharacterSetCreator("Hexadecimal", HEXADECIMAL_CREATOR, 16, 4, true, true);

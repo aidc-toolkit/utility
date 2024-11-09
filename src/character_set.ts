@@ -362,7 +362,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
     /**
      * Values that would generate all zeros in the created string.
      */
-    private readonly _allZerosValues: readonly bigint[] | undefined;
+    private readonly _allZerosValues: readonly bigint[];
 
     /**
      * Constructor.
@@ -387,6 +387,12 @@ export class CharacterSetCreator extends CharacterSetValidator {
         exclusionDomains[Exclusion.None] = exclusionNoneDomains;
 
         if (exclusionSupport.includes(Exclusion.FirstZero)) {
+            if (characterSet[0] !== "0") {
+                throw new RangeError(i18next.t("CharacterSetValidator.firstZeroFirstCharacter", {
+                    ns: utilityNS
+                }));
+            }
+
             const exclusionFirstZeroDomains = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
 
             // Exclusion of first zero mathematically prohibits length of 0.
@@ -403,9 +409,23 @@ export class CharacterSetCreator extends CharacterSetValidator {
         if (exclusionSupport.includes(Exclusion.AllNumeric)) {
             const exclusionAllNumericDomains = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
 
+            const numberIndexes = this.characterIndexes("0123456789");
+
+            let expectedNumberIndex = numberIndexes[0];
+
+            // Make sure that all numeric characters are present and in sequence.
+            for (const numberIndex of numberIndexes) {
+                if (numberIndex === undefined || numberIndex !== expectedNumberIndex) {
+                    throw new RangeError(i18next.t("CharacterSetValidator.allNumericAllNumericCharacters", {
+                        ns: utilityNS
+                    }));
+                }
+
+                expectedNumberIndex = numberIndex + 1;
+            }
+
             // Zero index is the all-zero value for a single-character string.
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Zero is known to be present in the character set.
-            const zeroIndex = BigInt(this.characterIndex("0")!);
+            const zeroIndex = BigInt((numberIndexes as number[])[0]);
 
             const allZerosValues = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
             let allZerosValue = 0n;
@@ -423,6 +443,9 @@ export class CharacterSetCreator extends CharacterSetValidator {
             this._allZerosValues = allZerosValues;
 
             exclusionDomains[Exclusion.AllNumeric] = exclusionAllNumericDomains;
+        } else {
+            // Empty array obviates need for non-null assertion while still forcing error if indexed due to a bug.
+            this._allZerosValues = [];
         }
 
         this._exclusionDomains = exclusionDomains;
@@ -588,8 +611,8 @@ export class CharacterSetCreator extends CharacterSetValidator {
         this.validateLength(length);
         this.validateExclusion(exclusion);
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- All-zeros values is known to be defined for all-numeric exclusion.
-        const allZerosValue = exclusion === Exclusion.AllNumeric ? this._allZerosValues![length] : undefined;
+        // Zero value obviates need for non-null assertion.
+        const allZerosValue = exclusion === Exclusion.AllNumeric ? this._allZerosValues[length] : 0n;
 
         const transformer = Transformer.get(this._exclusionDomains[exclusion][length], tweak);
 
@@ -600,11 +623,9 @@ export class CharacterSetCreator extends CharacterSetValidator {
             if (length !== 0) {
                 let convertValue = transformedValue;
 
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- All-zeros value is known to be defined for all-numeric exclusion.
-                if (exclusion === Exclusion.AllNumeric && convertValue >= allZerosValue!) {
+                if (exclusion === Exclusion.AllNumeric && convertValue >= allZerosValue) {
                     // Value to convert is shifted by the number of all-numeric strings that occur at or prior to it.
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- All-zeros value is known to be defined for all-numeric exclusion.
-                    convertValue = convertValue + this.allNumericShift(true, length, convertValue - allZerosValue!);
+                    convertValue = convertValue + this.allNumericShift(true, length, convertValue - allZerosValue);
                 }
 
                 // Build string from right to left excluding the first character.
@@ -680,8 +701,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
         }, 0n);
 
         if (exclusion === Exclusion.AllNumeric) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- All-zeros values is known to be defined for all-numeric exclusion.
-            const allZerosValue = this._allZerosValues![length];
+            const allZerosValue = this._allZerosValues[length];
 
             if (value >= allZerosValue) {
                 // Call will ensure that string is not all-numeric.

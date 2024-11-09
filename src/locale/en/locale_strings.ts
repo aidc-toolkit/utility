@@ -11,6 +11,8 @@ export const localeStrings = {
         stringDoesNotMatchPattern: "String {{s}} does not match pattern"
     },
     CharacterSetValidator: {
+        firstZeroFirstCharacter: "Character set must support zero as first character",
+        allNumericAllNumericCharacters: "Character set must support all numeric characters in sequence",
         stringMustNotBeAllNumeric: "String must not be all numeric",
         lengthMustBeGreaterThanOrEqualTo: "Length {{length}} must be greater than or equal to {{minimumLength}}",
         lengthMustBeLessThanOrEqualTo: "Length {{length}} must be less than or equal to {{maximumLength}}",

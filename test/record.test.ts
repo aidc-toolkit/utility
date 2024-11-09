@@ -5,7 +5,6 @@ import { RecordValidator } from "../src/index.js";
 await i18nInit(I18NEnvironment.CLI, true);
 
 describe("Record validator", () => {
-    // eslint-disable-next-line jsdoc/require-jsdoc -- No JSDoc in test files.
     enum StringEnum {
         ValueA = "A",
         ValueB = "B",
