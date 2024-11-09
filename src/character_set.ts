@@ -357,7 +357,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
     /**
      * Domains for every length for every supported {@link Exclusion}.
      */
-    private readonly _exclusionDomains: ReadonlyArray<readonly bigint[] | undefined>;
+    private readonly _exclusionDomains: ReadonlyArray<readonly bigint[]>;
 
     /**
      * Values that would generate all zeros in the created string.
@@ -380,12 +380,14 @@ export class CharacterSetCreator extends CharacterSetValidator {
         this._characterSetSizeN = BigInt(this.characterSetSize);
         this._characterSetSizeMinusOneN = BigInt(this.characterSetSize - 1);
 
+        const exclusionDomains: Array<readonly bigint[]> = [];
+
         const exclusionNoneDomains = CharacterSetCreator.createPowersOf(this.characterSetSize);
 
-        let exclusionFirstZeroDomains: bigint[] | undefined;
+        exclusionDomains[Exclusion.None] = exclusionNoneDomains;
 
         if (exclusionSupport.includes(Exclusion.FirstZero)) {
-            exclusionFirstZeroDomains = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
+            const exclusionFirstZeroDomains = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
 
             // Exclusion of first zero mathematically prohibits length of 0.
             exclusionFirstZeroDomains[0] = 0n;
@@ -394,12 +396,12 @@ export class CharacterSetCreator extends CharacterSetValidator {
                 // Domain excludes zero as the first character and so works with previous exclusion none domain.
                 exclusionFirstZeroDomains[index] = this._characterSetSizeMinusOneN * exclusionNoneDomains[index - 1];
             }
+
+            exclusionDomains[Exclusion.FirstZero] = exclusionFirstZeroDomains;
         }
 
-        let exclusionAllNumericDomains: bigint[] | undefined;
-
         if (exclusionSupport.includes(Exclusion.AllNumeric)) {
-            exclusionAllNumericDomains = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
+            const exclusionAllNumericDomains = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
 
             // Zero index is the all-zero value for a single-character string.
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Zero is known to be present in the character set.
@@ -419,13 +421,11 @@ export class CharacterSetCreator extends CharacterSetValidator {
             }
 
             this._allZerosValues = allZerosValues;
+
+            exclusionDomains[Exclusion.AllNumeric] = exclusionAllNumericDomains;
         }
 
-        this._exclusionDomains = [
-            exclusionNoneDomains,
-            exclusionFirstZeroDomains,
-            exclusionAllNumericDomains
-        ];
+        this._exclusionDomains = exclusionDomains;
     }
 
     /**
@@ -438,8 +438,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * `characterSetSize**power`.
      */
     private powerOfSize(power: number): bigint {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Exclusion.None is always present.
-        return this._exclusionDomains[Exclusion.None]![power];
+        return this._exclusionDomains[Exclusion.None][power];
     }
 
     /**
@@ -592,8 +591,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- All-zeros values is known to be defined for all-numeric exclusion.
         const allZerosValue = exclusion === Exclusion.AllNumeric ? this._allZerosValues![length] : undefined;
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Exclusion is valid so exclusion domain at index is valid.
-        const transformer = Transformer.get(this._exclusionDomains[exclusion]![length], tweak);
+        const transformer = Transformer.get(this._exclusionDomains[exclusion][length], tweak);
 
         return transformer.forward(valueOrValues, (transformedValue, index) => {
             let s = "";
@@ -691,8 +689,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
             }
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Exclusion is valid so exclusion domain at index is valid.
-        return Transformer.get(this._exclusionDomains[exclusion]![length], tweak).reverse(value);
+        return Transformer.get(this._exclusionDomains[exclusion][length], tweak).reverse(value);
     }
 }
 
