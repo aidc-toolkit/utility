@@ -86,7 +86,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * Character set map, mapping each character in the character set to its index such that
      * `_characterSetMap.get(_characterSet[index]) === index`.
      */
-    private readonly _characterSetMap: Map<string, number>;
+    private readonly _characterSetMap: ReadonlyMap<string, number>;
 
     /**
      * Exclusions supported by the character set.
@@ -106,7 +106,13 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
     constructor(characterSet: readonly string[], ...exclusionSupport: readonly Exclusion[]) {
         this._characterSet = characterSet;
 
-        this._characterSetMap = new Map(characterSet.map((c, index) => [c, index]));
+        const characterSetMap = new Map<string, number>();
+
+        characterSet.forEach((c, index) => {
+            characterSetMap.set(c, index);
+        });
+
+        this._characterSetMap = characterSetMap;
 
         this._exclusionSupport = exclusionSupport;
     }
