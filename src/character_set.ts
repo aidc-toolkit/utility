@@ -269,6 +269,9 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
             this.validateExclusion(validation.exclusion);
 
             switch (validation.exclusion) {
+                case Exclusion.None:
+                    break;
+
                 case Exclusion.FirstZero:
                     if (s.startsWith("0")) {
                         throw new RangeError(i18next.t(validation.component === undefined ? "CharacterSetValidator.invalidCharacterAtPosition" : "CharacterSetValidator.invalidCharacterAtPositionOfComponent", {
