@@ -1,6 +1,6 @@
 import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { Sequencer, EncryptionTransformer, IdentityTransformer, Transformer } from "../src/index.js";
+import { EncryptionTransformer, IdentityTransformer, Sequencer, Transformer } from "../src/index.js";
 
 await i18nInit(I18NEnvironment.CLI, true);
 
