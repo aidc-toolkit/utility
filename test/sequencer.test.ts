@@ -1,7 +1,6 @@
 import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { Sequencer } from "../src/index.js";
-import { IteratorProxy } from "../src/iterator_proxy.js";
+import { IteratorProxy, Sequencer } from "../src/index.js";
 
 await i18nInit(I18NEnvironment.CLI, true);
 

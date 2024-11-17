@@ -6,10 +6,10 @@ import {
     CharacterSetCreator,
     Exclusion,
     HEXADECIMAL_CREATOR,
+    IteratorProxy,
     NUMERIC_CREATOR,
     Sequencer
 } from "../src/index.js";
-import { IteratorProxy } from "../src/iterator_proxy.js";
 
 await i18nInit(I18NEnvironment.CLI, true);
 
