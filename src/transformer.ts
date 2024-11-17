@@ -1,3 +1,4 @@
+import { IteratorProxy } from "./iterator_proxy.js";
 import i18next, { utilityNS } from "./locale/i18n.js";
 import { Sequencer } from "./sequencer.js";
 
@@ -266,18 +267,18 @@ export abstract class Transformer {
             }
 
             result = transformationCallback === undefined ?
-                Iterator.from(valueOrValues).map(value => this.doForward(value)) :
-                Iterator.from(valueOrValues).map((value, index) => transformationCallback(this.doForward(value), index));
+                IteratorProxy.from(valueOrValues).map(value => this.doForward(value)) :
+                IteratorProxy.from(valueOrValues).map((value, index) => transformationCallback(this.doForward(value), index));
         } else {
             result = transformationCallback === undefined ?
-                Iterator.from(valueOrValues).map((value) => {
+                IteratorProxy.from(valueOrValues).map((value) => {
                     const valueN = BigInt(value);
 
                     this.validate(valueN);
 
                     return this.doForward(valueN);
                 }) :
-                Iterator.from(valueOrValues).map((value, index) => {
+                IteratorProxy.from(valueOrValues).map((value, index) => {
                     const valueN = BigInt(value);
 
                     this.validate(valueN);

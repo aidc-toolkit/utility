@@ -9,6 +9,7 @@ import {
     NUMERIC_CREATOR,
     Sequencer
 } from "../src/index.js";
+import { IteratorProxy } from "../src/iterator_proxy.js";
 
 await i18nInit(I18NEnvironment.CLI, true);
 
@@ -64,7 +65,7 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
                     break;
             }
 
-            const sequence = Iterator.from(characterSetCreator.create(length, new Sequencer(0n, domain), exclusion));
+            const sequence = IteratorProxy.from(characterSetCreator.create(length, new Sequencer(0n, domain), exclusion));
 
             let previousS = "";
 
@@ -85,7 +86,7 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
 
             expect(() => characterSetCreator.create(length, domain, exclusion)).toThrow(`Value ${domain} must be less than ${domain}`);
 
-            const sparseSequence = Iterator.from(characterSetCreator.create(length, new Sequencer(domain - 1, -domain), exclusion, 123456n));
+            const sparseSequence = IteratorProxy.from(characterSetCreator.create(length, new Sequencer(domain - 1, -domain), exclusion, 123456n));
 
             let sequential = true;
             previousS = "~";
