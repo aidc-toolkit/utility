@@ -504,20 +504,15 @@ class IteratorDropProxy<T> extends IteratorCountProxyBase<T> {
 }
 
 /**
- * Iterator type.
+ * Iterator proxy. In environments where
+ * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator#iterator_helpers |
+ * iterator helpers} are supported, this references the @link Iterator} variable directly. Otherwise, it references an
+ * implementation of "from" that uses an internally-defined iterator proxy object.
+ *
+ * Client applications should **not** rely on long-term availability of this variable as it will be removed once there
+ * is widespread support for iterator helpers.
  */
-type IteratorType = typeof Iterator;
-
-/**
- * Iterator proxy is interested only in the "from" method.
- */
-type IteratorProxyType = Pick<IteratorType, "from">;
-
-/**
- * Iterator proxy. In environments where the Iterator variable is supported, this is the Iterator variable. Otherwise,
- * it's an implementation of "from" that uses an internally-defined iterator proxy object.
- */
-export const IteratorProxy: IteratorProxyType = isIteratorSupported() ?
+export const IteratorProxy: Pick<typeof Iterator, "from"> = isIteratorSupported() ?
     Iterator :
     {
         /**
