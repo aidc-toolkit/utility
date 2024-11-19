@@ -1,59 +1,34 @@
 /**
- * Determine if Iterator variable is supported.
- *
- * @returns
- * True if Iterator variable is supported.
- */
-function isIteratorSupported(): boolean {
-    let supported: boolean;
-
-    try {
-        // Not supported if in testing.
-        supported = process.env["NODE_ENV"] !== "test";
-    } catch (_e) {
-        // Assume supported.
-        supported = true;
-    }
-
-    if (supported) {
-        try {
-            Iterator.from([]);
-        } catch (_e) {
-            supported = false;
-        }
-    }
-
-    return supported;
-}
-
-/**
  * Iteration source; shortcut for iterator or iterable.
- */
-export type IterationSource<T> = Iterator<T> | Iterable<T>;
-
-/**
- * Convert an iteration source to an iterable.
  *
- * @param iterationSource
- * Iteration source.
- *
- * @returns
- * Iteration source if it is already an iterable, otherwise iteration source wrapped in an interable.
+ * Client applications should **not** rely on long-term availability of this variable as it will be removed once there
+ * is widespread support for iterator helpers.
  */
-function iterationSourceToIterable<T>(iterationSource: IterationSource<T>): Iterable<T> {
-    return Symbol.iterator in iterationSource ?
-        iterationSource :
-        {
-            [Symbol.iterator](): Iterator<T> {
-                return iterationSource;
-            }
-        };
-}
+type IterationSource<T> = Iterator<T> | Iterable<T>;
 
 /**
  * Iterator proxy base; provides common functionality for all iterator objects.
  */
 abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFinal, undefined> {
+    /**
+     * Convert an iteration source to an iterable.
+     *
+     * @param iterationSource
+     * Iteration source.
+     *
+     * @returns
+     * Iteration source if it is already an iterable, otherwise iteration source wrapped in an iterable.
+     */
+    protected static toIterable<T>(iterationSource: IterationSource<T>): Iterable<T> {
+        return Symbol.iterator in iterationSource ?
+            iterationSource :
+            {
+                [Symbol.iterator](): Iterator<T> {
+                    return iterationSource;
+                }
+            };
+    }
+
     /**
      * Initial iterable.
      */
@@ -71,7 +46,7 @@ abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFi
      * Initial iteration source.
      */
     constructor(initialIterationSource: IterationSource<TInitial>) {
-        this._initialIterable = iterationSourceToIterable(initialIterationSource);
+        this._initialIterable = IteratorProxyBase.toIterable(initialIterationSource);
     }
 
     /**
@@ -133,8 +108,8 @@ abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFi
     /**
      * @inheritDoc
      */
-    map<U>(callbackfn: (value: TFinal, index: number) => U): IteratorObject<U, undefined> {
-        return new IteratorMapProxy(this, callbackfn);
+    map<U>(callback: (value: TFinal, index: number) => U): IteratorObject<U, undefined> {
+        return new IteratorMapProxy(this, callback);
     }
 
     /**
@@ -148,7 +123,7 @@ abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFi
      * @inheritDoc
      */
     filter(predicate: (value: TFinal, index: number) => unknown): IteratorObject<TFinal, undefined> {
-        return new IteratorFilterProxy(this, predicate);
+        return new IteratorFilterProxy(this, predicate, true);
     }
 
     /**
@@ -168,7 +143,7 @@ abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFi
     /**
      * @inheritDoc
      */
-    reduce<U>(callbackfn: (previousValue: U, currentValue: TFinal, currentIndex: number) => U, initialValue?: U): U {
+    reduce<U>(callback: (previousValue: U, currentValue: TFinal, currentIndex: number) => U, initialValue?: U): U {
         let index = 0;
         let result = initialValue;
 
@@ -178,7 +153,7 @@ abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFi
                 result = value as unknown as U;
             } else {
                 // Iteration has occurred at least once so result is of the expected type.
-                result = callbackfn(result as U, value, index);
+                result = callback(result as U, value, index);
             }
 
             index++;
@@ -202,69 +177,36 @@ abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFi
     /**
      * @inheritDoc
      */
-    forEach(callbackfn: (value: TFinal, index: number) => void): void {
+    forEach(callback: (value: TFinal, index: number) => void): void {
         let index = 0;
 
         for (const element of this) {
-            callbackfn(element, index++);
+            callback(element, index++);
         }
-    }
-
-    /**
-     * Iterate until the truthy result of the predicate changes or until the iterator is exhausted.
-     *
-     * @param predicate
-     * Predicate.
-     *
-     * @param initialTruthy
-     * Initial truthy result of the predicate.
-     *
-     * @returns
-     * Iterator result.
-     */
-    private untilChanged(predicate: (value: TFinal, index: number) => unknown, initialTruthy: boolean): IteratorResult<TFinal, undefined> {
-        let result: IteratorResult<TFinal, undefined> | undefined;
-
-        const iterator = this[Symbol.iterator]();
-        let index = 0;
-
-        do {
-            result = iterator.next();
-
-            if (result.done !== true) {
-                const truthy = Boolean(predicate(result.value, index++));
-
-                if (truthy === initialTruthy) {
-                    result = undefined;
-                }
-            }
-        } while (result === undefined);
-
-        return result;
     }
 
     /**
      * @inheritDoc
      */
     some(predicate: (value: TFinal, index: number) => unknown): boolean {
-        // Iterate until predicate returns truthy; return done status.
-        return this.untilChanged(predicate, false).done !== true;
+        // Filter until predicate returns truthy; return true if found.
+        return new IteratorFilterProxy(this, predicate, true).next().done !== true;
     }
 
     /**
      * @inheritDoc
      */
     every(predicate: (value: TFinal, index: number) => unknown): boolean {
-        // Iterate until predicate returns falsy; return done status.
-        return this.untilChanged(predicate, true).done === true;
+        // Filter until predicate returns falsy; return false if found.
+        return new IteratorFilterProxy(this, predicate, false).next().done === true;
     }
 
     /**
      * @inheritDoc
      */
     find(predicate: (value: TFinal, index: number) => unknown): TFinal | undefined {
-        // Iterate until predicate returns truthy; return value.
-        return this.untilChanged(predicate, false).value;
+        // Filter until predicate returns truthy; return value.
+        return new IteratorFilterProxy(this, predicate, true).next().value;
     }
 }
 
@@ -276,14 +218,15 @@ class IteratorProxyObject<T> extends IteratorProxyBase<T, T> {
      * @inheritDoc
      */
     next(...value: [] | [unknown]): IteratorResult<T, undefined> {
+        // Initial result is the final result.
         return this.initialNext(...value);
     }
 }
 
 /**
- * Iterator callback proxy base.
+ * Iterator map proxy base.
  */
-abstract class IteratorCallbackProxyBase<TInitial, TIntermediate, TFinal> extends IteratorProxyBase<TInitial, TFinal> {
+abstract class IteratorMapProxyBase<TInitial, TIntermediate, TFinal> extends IteratorProxyBase<TInitial, TFinal> {
     /**
      * Callback.
      */
@@ -313,48 +256,44 @@ abstract class IteratorCallbackProxyBase<TInitial, TIntermediate, TFinal> extend
     /**
      * Get the next result from the intermediate iterator.
      *
-     * @param initialResult
-     * Next result from the initial iterator.
+     * @param value
+     * Tuple value to be passed to Iterator.next().
      *
      * @returns
      * Next result from the intermediate iterator.
      */
-    protected intermediateNext(initialResult: IteratorResult<TInitial, undefined>): IteratorResult<TIntermediate, undefined> {
-        let intermediateResult: IteratorResult<TIntermediate, undefined>;
+    protected intermediateNext(...value: [] | [unknown]): IteratorResult<TIntermediate, undefined> {
+        const initialResult = this.initialNext(...value);
 
-        if (initialResult.done !== true) {
-            intermediateResult = {
-                done: false,
+        return initialResult.done !== true ?
+            {
                 value: this._callback(initialResult.value, this._index++)
-            };
-        } else {
-            intermediateResult = {
+            } :
+            {
                 done: true,
                 value: undefined
             };
-        }
-
-        return intermediateResult;
     }
 }
 
 /**
  * Iterator map proxy.
  */
-class IteratorMapProxy<TInitial, TFinal> extends IteratorCallbackProxyBase<TInitial, TFinal, TFinal> {
+class IteratorMapProxy<TInitial, TFinal> extends IteratorMapProxyBase<TInitial, TFinal, TFinal> {
     /**
      * @inheritDoc
      */
     next(...value: [] | [unknown]): IteratorResult<TFinal, undefined> {
-        return this.intermediateNext(this.initialNext(...value));
+        // Intermediate result is the final result.
+        return this.intermediateNext(...value);
     }
 }
 
 /**
  * Iterator flat map proxy.
  */
-class IteratorFlatMapProxy<TInitial, TFinal> extends IteratorCallbackProxyBase<TInitial, IterationSource<TFinal>, TFinal> {
-    private _pendingFinalIterator: Iterator<TFinal, undefined> | undefined;
+class IteratorFlatMapProxy<TInitial, TFinal> extends IteratorMapProxyBase<TInitial, IterationSource<TFinal>, TFinal> {
+    private _intermediateIterator: Iterator<TFinal, undefined> | undefined;
 
     /**
      * @inheritDoc
@@ -363,26 +302,23 @@ class IteratorFlatMapProxy<TInitial, TFinal> extends IteratorCallbackProxyBase<T
         let finalResult: IteratorResult<TFinal, undefined> | undefined = undefined;
 
         do {
-            if (this._pendingFinalIterator === undefined) {
-                const intermediateResult = this.intermediateNext(this.initialNext(...value));
+            if (this._intermediateIterator === undefined) {
+                const intermediateResult = this.intermediateNext(...value);
 
                 if (intermediateResult.done === true) {
                     finalResult = intermediateResult;
                 } else {
-                    this._pendingFinalIterator = iterationSourceToIterable(intermediateResult.value)[Symbol.iterator]();
+                    this._intermediateIterator = IteratorProxyBase.toIterable(intermediateResult.value)[Symbol.iterator]();
                 }
             }
 
-            if (this._pendingFinalIterator !== undefined) {
-                const pendingFinalResult = this._pendingFinalIterator.next();
+            if (this._intermediateIterator !== undefined) {
+                const pendingFinalResult = this._intermediateIterator.next();
 
                 if (pendingFinalResult.done === true) {
-                    this._pendingFinalIterator = undefined;
+                    this._intermediateIterator = undefined;
                 } else {
-                    finalResult = {
-                        done: false,
-                        value: pendingFinalResult.value
-                    };
+                    finalResult = pendingFinalResult;
                 }
             }
         } while (finalResult === undefined);
@@ -394,35 +330,56 @@ class IteratorFlatMapProxy<TInitial, TFinal> extends IteratorCallbackProxyBase<T
 /**
  * Iterator filter proxy.
  */
-class IteratorFilterProxy<T> extends IteratorCallbackProxyBase<T, unknown, T> {
+class IteratorFilterProxy<T> extends IteratorProxyBase<T, T> {
+    /**
+     * Predicate.
+     */
+    private readonly _predicate: (value: T, index: number) => unknown;
+
+    /**
+     * Expected truthy result of the predicate.
+     */
+    private readonly _expectedTruthy: boolean;
+
+    /**
+     * Index into iteration source.
+     */
+    private _index: number;
+
+    /**
+     * Constructor.
+     *
+     * @param iterationSource
+     * Iteration source.
+     *
+     * @param predicate
+     * Predicate.
+     *
+     * @param expectedTruthy
+     * Expected truthy result of the predicate.
+     */
+    constructor(iterationSource: IterationSource<T>, predicate: (element: T, index: number) => unknown, expectedTruthy: boolean) {
+        super(iterationSource);
+
+        this._predicate = predicate;
+        this._expectedTruthy = expectedTruthy;
+
+        this._index = 0;
+    }
+
     /**
      * @inheritDoc
      */
     next(...value: [] | [unknown]): IteratorResult<T, undefined> {
-        let finalResult: IteratorResult<T, undefined> | undefined = undefined;
+        let result: IteratorResult<T, undefined> | undefined;
+
+        const expectedTruthy = this._expectedTruthy;
 
         do {
-            const initialResult = this.initialNext(...value);
+            result = this.initialNext(...value);
+        } while (result.done !== true && Boolean(this._predicate(result.value, this._index++)) !== expectedTruthy);
 
-            if (initialResult.done === true) {
-                finalResult = {
-                    done: true,
-                    value: undefined
-                };
-            } else {
-                const intermediateResult = this.intermediateNext(initialResult);
-                const booleanValue = Boolean(intermediateResult.value);
-
-                if (booleanValue) {
-                    finalResult = {
-                        done: false,
-                        value: initialResult.value
-                    };
-                }
-            }
-        } while (finalResult === undefined);
-
-        return finalResult;
+        return result;
     }
 }
 
@@ -455,11 +412,26 @@ abstract class IteratorCountProxyBase<T> extends IteratorProxyObject<T> {
     }
 
     /**
-     * Determine if count is exhausted.
+     * Determine if iterator is exhausted (by count or by iterator itself).
      */
-    protected get countExhausted(): boolean {
-        // Decrementing the count may go below zero so use less-than-or-equal comparison.
-        return this._count-- <= 0;
+    protected get exhausted(): boolean {
+        return this._count <= 0;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    override next(...value: [] | [unknown]): IteratorResult<T, undefined> {
+        const result = super.next(...value);
+
+        if (result.done !== true) {
+            this._count--;
+        } else {
+            // Iterator exhausted before count.
+            this._count = 0;
+        }
+
+        return result;
     }
 }
 
@@ -471,12 +443,12 @@ class IteratorTakeProxy<T> extends IteratorCountProxyBase<T> {
      * @inheritDoc
      */
     override next(...value: [] | [unknown]): IteratorResult<T, undefined> {
-        return this.countExhausted ?
+        return !this.exhausted ?
+            super.next(...value) :
             {
                 done: true,
                 value: undefined
-            } :
-            super.next(...value);
+            };
     }
 }
 
@@ -488,37 +460,58 @@ class IteratorDropProxy<T> extends IteratorCountProxyBase<T> {
      * @inheritDoc
      */
     override next(...value: [] | [unknown]): IteratorResult<T, undefined> {
-        let result: IteratorResult<T, undefined> | undefined = undefined;
+        while (!this.exhausted) {
+            super.next(...value);
+        }
 
-        do {
-            result = super.next(...value);
-
-            if (result.done !== true && !this.countExhausted) {
-                // Discard result.
-                result = undefined;
-            }
-        } while (result === undefined);
-
-        return result;
+        return super.next(...value);
     }
+}
+
+/**
+ * Determine if Iterator variable is supported.
+ *
+ * @returns
+ * True if Iterator variable is supported.
+ */
+function iteratorSupported(): boolean {
+    let supported: boolean;
+
+    try {
+        // Not supported if in testing.
+        supported = process.env["NODE_ENV"] !== "test";
+    } catch (_e) {
+        // Assume supported.
+        supported = true;
+    }
+
+    if (supported) {
+        try {
+            Iterator.from([]);
+        } catch (_e) {
+            supported = false;
+        }
+    }
+
+    return supported;
 }
 
 /**
  * Iterator proxy. In environments where
  * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator#iterator_helpers |
- * iterator helpers} are supported, this references the @link Iterator} variable directly. Otherwise, it references an
+ * iterator helpers} are supported, this references the {@link Iterator} variable directly. Otherwise, it references an
  * implementation of "from" that uses an internally-defined iterator proxy object.
  *
  * Client applications should **not** rely on long-term availability of this variable as it will be removed once there
  * is widespread support for iterator helpers.
  */
-export const IteratorProxy: Pick<typeof Iterator, "from"> = isIteratorSupported() ?
+export const IteratorProxy: Pick<typeof Iterator, "from"> = iteratorSupported() ?
     Iterator :
     {
         /**
          * @inheritDoc
          */
-        from<T>(value: IterationSource<T>): IteratorObject<T, undefined> {
+        from<T>(value: Iterator<T> | Iterable<T>): IteratorObject<T, undefined> {
             return value instanceof IteratorProxyBase ? value : new IteratorProxyObject(value);
         }
     };

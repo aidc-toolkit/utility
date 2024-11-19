@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { type IterationSource, IteratorProxy } from "../src/index.js";
+import { IteratorProxy } from "../src/index.js";
 
 const source: readonly string[] = [
     "1", "2", "3", "4", "5"
@@ -28,7 +28,7 @@ function callbackSource(): string[] {
 }
 
 describe("Basic", () => {
-    function validateIterable(iterationSource: IterationSource<string>): void {
+    function validateIterable(iterationSource: Iterator<string> | Iterable<string>): void {
         const iteratorProxy = IteratorProxy.from(iterationSource);
 
         expect(IteratorProxy.from(iteratorProxy)).toBe(iteratorProxy);
@@ -143,6 +143,22 @@ describe("Helpers", () => {
         }
 
         expect(count).toBe(3);
+
+        count = 0;
+
+        for (const element of IteratorProxy.from(source).take(source.length + 1)) {
+            expect(element).toBe(String(++count));
+        }
+
+        expect(count).toBe(source.length);
+
+        count = 0;
+
+        for (const element of IteratorProxy.from(source).take(0)) {
+            expect(element).toBe(String(++count));
+        }
+
+        expect(count).toBe(0);
     });
 
     test("Drop", () => {
@@ -153,6 +169,22 @@ describe("Helpers", () => {
         }
 
         expect(count).toBe(source.length - 3);
+
+        count = 0;
+
+        for (const element of IteratorProxy.from(source).drop(0)) {
+            expect(element).toBe(String(++count));
+        }
+
+        expect(count).toBe(source.length);
+
+        count = 0;
+
+        for (const element of IteratorProxy.from(source).drop(source.length)) {
+            expect(element).toBe(String(++count));
+        }
+
+        expect(count).toBe(0);
     });
 
     test("To array", () => {
