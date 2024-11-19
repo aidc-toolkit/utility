@@ -148,8 +148,9 @@ abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFi
         let result = initialValue;
 
         for (const value of this) {
-            if (index === 0 && initialValue === undefined) {
-                // Initial value is undefined only when TFinal and U are identical.
+            // Need to check arguments length as U could include undefined.
+            if (index === 0 && arguments.length === 1) {
+                // Initial value is not supplied only when U is identical to TFinal.
                 result = value as unknown as U;
             } else {
                 // Iteration has occurred at least once so result is of the expected type.
@@ -159,7 +160,7 @@ abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFi
             index++;
         }
 
-        if (index === 0 && initialValue === undefined) {
+        if (index === 0 && arguments.length === 1) {
             throw new Error("reduce() of empty iterator with no initial value");
         }
 
@@ -310,9 +311,7 @@ class IteratorFlatMapProxy<TInitial, TFinal> extends IteratorMapProxyBase<TIniti
                 } else {
                     this._intermediateIterator = IteratorProxyBase.toIterable(intermediateResult.value)[Symbol.iterator]();
                 }
-            }
-
-            if (this._intermediateIterator !== undefined) {
+            } else {
                 const pendingFinalResult = this._intermediateIterator.next();
 
                 if (pendingFinalResult.done === true) {
@@ -405,7 +404,7 @@ abstract class IteratorCountProxyBase<T> extends IteratorProxyObject<T> {
         super(initialIterationSource);
 
         if (!Number.isInteger(count) || count < 0) {
-            throw new RangeError("Limit must be a positive integer");
+            throw new RangeError("Count must be a positive integer");
         }
 
         this._count = count;
@@ -469,12 +468,12 @@ class IteratorDropProxy<T> extends IteratorCountProxyBase<T> {
 }
 
 /**
- * Determine if Iterator variable is supported.
+ * Get Iterator variable if supported or a proxy for it if not.
  *
  * @returns
- * True if Iterator variable is supported.
+ * Iterator variable if supported or a proxy for it if not.
  */
-function iteratorSupported(): boolean {
+function iteratorProxy(): Pick<typeof Iterator, "from"> {
     let supported: boolean;
 
     try {
@@ -487,13 +486,23 @@ function iteratorSupported(): boolean {
 
     if (supported) {
         try {
+            // This will throw a ReferenceError if Iterator variable is not supported.
             Iterator.from([]);
         } catch (_e) {
             supported = false;
         }
     }
 
-    return supported;
+    return supported ?
+        Iterator :
+        {
+            /**
+             * @inheritDoc
+             */
+            from<T>(value: Iterator<T> | Iterable<T>): IteratorObject<T, undefined> {
+                return value instanceof IteratorProxyBase ? value : new IteratorProxyObject(value);
+            }
+        };
 }
 
 /**
@@ -505,13 +514,4 @@ function iteratorSupported(): boolean {
  * Client applications should **not** rely on long-term availability of this variable as it will be removed once there
  * is widespread support for iterator helpers.
  */
-export const IteratorProxy: Pick<typeof Iterator, "from"> = iteratorSupported() ?
-    Iterator :
-    {
-        /**
-         * @inheritDoc
-         */
-        from<T>(value: Iterator<T> | Iterable<T>): IteratorObject<T, undefined> {
-            return value instanceof IteratorProxyBase ? value : new IteratorProxyObject(value);
-        }
-    };
+export const IteratorProxy = iteratorProxy();
