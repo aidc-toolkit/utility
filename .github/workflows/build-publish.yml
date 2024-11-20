@@ -4,9 +4,6 @@ on:
   release:
     types:
       - published
-  push:
-    branches:
-      - main
 
 jobs:
   build-and-publish:
@@ -14,7 +11,7 @@ jobs:
 
     steps:
       - name: Build and publish utility
-        uses: aidc-toolkit/dev/.github/actions/build-publish@${{ github.ref_name }}
+        uses: aidc-toolkit/dev/.github/actions/build-publish@main
         with:
           project: utility
           node_version: ${{ vars.NODE_VERSION }}
