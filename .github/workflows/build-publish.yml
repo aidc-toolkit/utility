@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Build and publish utility
-        uses: aidc-toolkit/dev/.github/actions/build-publish@main
+        uses: aidc-toolkit/dev/.github/actions/build-publish@${{ github.ref_name }}
         with:
           project: utility
           node_version: ${{ vars.NODE_VERSION }}
