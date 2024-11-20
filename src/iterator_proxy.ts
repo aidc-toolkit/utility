@@ -150,10 +150,10 @@ abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFi
         for (const value of this) {
             // Need to check arguments length as U could include undefined.
             if (index === 0 && arguments.length === 1) {
-                // Initial value is not supplied only when U is identical to TFinal.
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Initial value is not supplied only when U is identical to TFinal.
                 result = value as unknown as U;
             } else {
-                // Iteration has occurred at least once so result is of the expected type.
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Iteration has occurred at least once so result is of the expected type.
                 result = callback(result as U, value, index);
             }
 
@@ -164,7 +164,7 @@ abstract class IteratorProxyBase<TInitial, TFinal> implements IteratorObject<TFi
             throw new Error("reduce() of empty iterator with no initial value");
         }
 
-        // Iteration has occurred at least once so result is of the expected type.
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Iteration has occurred at least once so result is of the expected type.
         return result as U;
     }
 
@@ -508,8 +508,8 @@ function iteratorProxy(): Pick<typeof Iterator, "from"> {
 /**
  * Iterator proxy. In environments where
  * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator#iterator_helpers |
- * iterator helpers} are supported, this references the {@link Iterator} variable directly. Otherwise, it references an
- * implementation of "from" that uses an internally-defined iterator proxy object.
+ * iterator helpers} are supported, this references the {@linkcode Iterator} variable directly. Otherwise, it references
+ * an implementation of "from" that uses an internally-defined iterator proxy object.
  *
  * Client applications should **not** rely on long-term availability of this variable as it will be removed once there
  * is widespread support for iterator helpers.

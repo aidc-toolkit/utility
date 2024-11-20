@@ -418,23 +418,33 @@ export class CharacterSetCreator extends CharacterSetValidator {
         if (exclusionSupport.includes(Exclusion.AllNumeric)) {
             const exclusionAllNumericDomains = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
 
-            const numberIndexes = this.characterIndexes("0123456789");
+            /**
+             * Validate that number indexes are defined and sequential.
+             *
+             * @param numberIndexes
+             * Number indexes.
+             */
+            function validateNumberIndexes(numberIndexes: ReadonlyArray<number | undefined>): asserts numberIndexes is number[] {
+                let expectedNumberIndex = numberIndexes[0];
 
-            let expectedNumberIndex = numberIndexes[0];
+                // Make sure that all numeric characters are present and in sequence.
+                for (const numberIndex of numberIndexes) {
+                    if (numberIndex === undefined || numberIndex !== expectedNumberIndex) {
+                        throw new RangeError(i18next.t("CharacterSetValidator.allNumericAllNumericCharacters", {
+                            ns: utilityNS
+                        }));
+                    }
 
-            // Make sure that all numeric characters are present and in sequence.
-            for (const numberIndex of numberIndexes) {
-                if (numberIndex === undefined || numberIndex !== expectedNumberIndex) {
-                    throw new RangeError(i18next.t("CharacterSetValidator.allNumericAllNumericCharacters", {
-                        ns: utilityNS
-                    }));
+                    expectedNumberIndex = numberIndex + 1;
                 }
-
-                expectedNumberIndex = numberIndex + 1;
             }
 
+            const numberIndexes = this.characterIndexes("0123456789");
+
+            validateNumberIndexes(numberIndexes);
+
             // Zero index is the all-zero value for a single-character string.
-            const zeroIndex = BigInt((numberIndexes as number[])[0]);
+            const zeroIndex = BigInt(numberIndexes[0]);
 
             const allZerosValues = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
             let allZerosValue = 0n;
