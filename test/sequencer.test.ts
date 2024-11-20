@@ -2,7 +2,7 @@ import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
 import { IteratorProxy, Sequencer } from "../src/index.js";
 
-await i18nInit(I18NEnvironment.CLI, true);
+await i18nInit(I18NEnvironment.CLI);
 
 describe("Sequence", () => {
     const sequencer1 = new Sequencer(10, 20);

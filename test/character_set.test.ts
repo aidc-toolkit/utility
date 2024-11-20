@@ -11,7 +11,7 @@ import {
     Sequencer
 } from "../src/index.js";
 
-await i18nInit(I18NEnvironment.CLI, true);
+await i18nInit(I18NEnvironment.CLI);
 
 function testCharacterSetCreator(name: string, characterSetCreator: CharacterSetCreator, characterSetSize: number, length: number, excludeFirstZero: boolean, excludeAllNumeric: boolean): void {
     describe(name, () => {
