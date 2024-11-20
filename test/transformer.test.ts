@@ -1,6 +1,6 @@
 import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { EncryptionTransformer, IdentityTransformer, Sequencer, Transformer } from "../src/index.js";
+import { EncryptionTransformer, IdentityTransformer, IteratorProxy, Sequencer, Transformer } from "../src/index.js";
 
 await i18nInit(I18NEnvironment.CLI, true);
 
@@ -11,7 +11,7 @@ function testTransformer(domain: number, tweak?: number, callback?: (value: bigi
 
     const transformedValuesSet = new Set<bigint>();
 
-    Iterator.from(transformer.forward(new Sequencer(0n, domain))).forEach((transformedValue, index) => {
+    IteratorProxy.from(transformer.forward(new Sequencer(0n, domain))).forEach((transformedValue, index) => {
         const indexN = BigInt(index);
 
         if (sequential && transformedValue !== indexN) {
