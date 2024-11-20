@@ -194,7 +194,7 @@ testCharacterSetCreator("Hexadecimal", HEXADECIMAL_CREATOR, 16, 4, true, true);
 testCharacterSetCreator("Alphabetic", ALPHABETIC_CREATOR, 26, 3, false, false);
 testCharacterSetCreator("Alphanumeric", ALPHANUMERIC_CREATOR, 36, 3, true, true);
 testCharacterSetCreator("Middle numeric", new CharacterSetCreator([
-    "(", ")", "*", "+",
+    "(", ")",
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    ":", ";", "<", ">"
-], Exclusion.AllNumeric), 18, 4, false, true);
+    "<", ">"
+], Exclusion.AllNumeric), 14, 4, false, true);
