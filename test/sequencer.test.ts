@@ -1,6 +1,6 @@
 import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { IteratorProxy, Sequencer } from "../src/index.js";
+import { Sequencer } from "../src/index.js";
 
 await i18nInit(I18NEnvironment.CLI);
 
@@ -29,7 +29,7 @@ describe("Sequence", () => {
         expectedValue = 10n;
         count = 0;
 
-        for (const value of IteratorProxy.from(sequencer1)) {
+        for (const value of Iterator.from(sequencer1)) {
             expect(value).toBe(expectedValue);
 
             expectedValue++;
@@ -41,7 +41,7 @@ describe("Sequence", () => {
         expectedValue = 29n;
         count = 0;
 
-        for (const value of IteratorProxy.from(sequencer2)) {
+        for (const value of Iterator.from(sequencer2)) {
             expect(value).toBe(expectedValue);
 
             expectedValue--;
@@ -60,7 +60,7 @@ describe("Sequence", () => {
 
         sequencer1.reset();
 
-        for (const value of IteratorProxy.from(sequencer1)) {
+        for (const value of Iterator.from(sequencer1)) {
             expect(value).toBe(expectedValue);
 
             expectedValue++;
