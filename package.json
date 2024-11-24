@@ -19,7 +19,7 @@
     "url": "https://www.linkedin.com/in/kdean"
   },
   "scripts": {
-    "eslint": "eslint .",
+    "lint": "eslint .",
     "build": "tsup src/index.ts --clean --format cjs,esm --dts",
     "build-doc": "npm run build && tsc src/index.ts --outDir dist --target esnext --moduleResolution nodenext --module nodenext --emitDeclarationOnly --declaration --declarationMap",
     "test": "vitest run"
