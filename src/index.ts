@@ -1,3 +1,4 @@
+export type * from "./types.js";
 export * from "./iterator_proxy.js";
 export * from "./sequencer.js";
 export * from "./transformer.js";

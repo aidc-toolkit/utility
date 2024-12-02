@@ -1,23 +1,7 @@
 import { IteratorProxy } from "./iterator_proxy.js";
 import i18next, { utilityNS } from "./locale/i18n.js";
 import { Sequencer } from "./sequencer.js";
-
-/**
- * Transformation callback, used to convert transformed value to its final value.
- *
- * @template T
- * Type returned by callback.
- *
- * @param transformedValue
- * Transformed value.
- *
- * @param index
- * Index in sequence transformation (0 for single transformation).
- *
- * @returns
- * Final value.
- */
-export type TransformationCallback<T> = (transformedValue: bigint, index: number) => T;
+import type { TransformerCallback, TransformerInput, TransformerOutput } from "./types.js";
 
 /**
  * Transformer that transforms values in a numeric domain to values in a range equal to the domain or to another range
@@ -143,104 +127,45 @@ export abstract class Transformer {
     protected abstract doForward(value: bigint): bigint;
 
     /**
-     * Transform a value forward.
-     *
-     * @param value
-     * Value.
-     *
-     * @returns
-     * Transformed value.
-     */
-    forward(value: number | bigint): bigint;
-
-    /**
-     * Transform a value forward.
+     * Transform value(s) forward.
      *
      * @template T
-     * Type returned by transformation callback.
+     * Value(s) input type.
      *
-     * @param value
-     * Value.
-     *
-     * @param transformationCallback
-     * Called after the value is transformed to convert it to its final value.
+     * @param valueOrValues
+     * Value(s). If this is an instance of {@link Sequencer}, the minimum and maximum values are validated prior to
+     * transformation. Otherwise, the individual value(s) is/are validated at the time of transformation.
      *
      * @returns
-     * Value transformed into object.
+     * Transformed value(s).
      */
-    forward<T>(value: number | bigint, transformationCallback: TransformationCallback<T>): T;
+    forward<T extends TransformerInput<number | bigint>>(valueOrValues: T): TransformerOutput<T, bigint>;
 
     /**
-     * Transform values forward.
-     *
-     * @param values
-     * Values. If this is an instance of {@link Sequencer}, the minimum and maximum values are validated prior to
-     * transformation. Otherwise, the individual values are validated at the time of transformation.
-     *
-     * @returns
-     * Transformed values.
-     */
-    forward(values: Iterable<number | bigint>): IterableIterator<bigint>;
-
-    /**
-     * Transform values forward.
+     * Transform value(s) forward, optionally applying a transformation.
      *
      * @template T
-     * Type returned by transformation callback.
+     * Value(s) input type.
      *
-     * @param values
-     * Values. If this is an instance of {@link Sequencer}, the minimum and maximum values are validated prior to
-     * transformation. Otherwise, the individual values are validated at the time of transformation.
+     * @template U
+     * Transformation callback output type.
      *
-     * @param transformationCallback
+     * @param valueOrValues
+     * Value(s). If this is an instance of {@link Sequencer}, the minimum and maximum values are validated prior to
+     * transformation. Otherwise, the individual value(s) is/are validated at the time of transformation.
+     *
+     * @param transformerCallback
      * Called after each value is transformed to convert it to its final value.
      *
      * @returns
-     * Values transformed into objects.
+     * Transformed value(s).
      */
-    forward<T>(values: Iterable<number | bigint>, transformationCallback: TransformationCallback<T>): IterableIterator<T>;
+    forward<T extends TransformerInput<number | bigint>, U>(valueOrValues: T, transformerCallback: TransformerCallback<bigint, U>): TransformerOutput<T, U>;
 
-    /**
-     * Transform a value or values forward. This signature exists to allow similar overloaded methods in other classes
-     * to call this method correctly.
-     *
-     * @param valueOrValues
-     *
-     * @returns
-     */
-    forward(valueOrValues: number | bigint | Iterable<number | bigint>): bigint | IterableIterator<bigint>;
-
-    /**
-     * Transform a value or values forward. This signature exists to allow similar overloaded methods in other classes
-     * to call this method correctly.
-     *
-     * @template T
-     *
-     * @param valueOrValues
-     *
-     * @param transformationCallback
-     *
-     * @returns
-     */
-    forward<T>(valueOrValues: number | bigint | Iterable<number | bigint>, transformationCallback: TransformationCallback<T>): T | IterableIterator<T>;
-
-    /**
-     * Transform a value or values forward.
-     *
-     * @template T
-     * Type returned by transformation callback.
-     *
-     * @param valueOrValues
-     * Value(s).
-     *
-     * @param transformationCallback
-     * Called after value(s) is/are transformed to convert it/them to its/their final value(s).
-     *
-     * @returns
-     * Value(s) transformed into object(s).
-     */
-    forward<T>(valueOrValues: number | bigint | Iterable<number | bigint>, transformationCallback?: TransformationCallback<T>): bigint | T | IterableIterator<bigint> | IterableIterator<T> {
-        let result: bigint | T | IterableIterator<bigint> | IterableIterator<T>;
+    // eslint-disable-next-line jsdoc/require-jsdoc -- Implementation of overloaded signatures.
+    forward<T extends TransformerInput<number | bigint>, U>(valueOrValues: T, transformerCallback?: TransformerCallback<bigint, U>): TransformerOutput<T, U> {
+        // TODO Refactor type when https://github.com/microsoft/TypeScript/pull/56941 released.
+        let result: bigint | U | IterableIterator<bigint> | IterableIterator<U>;
 
         if (typeof valueOrValues !== "object") {
             const valueN = BigInt(valueOrValues);
@@ -249,7 +174,7 @@ export abstract class Transformer {
 
             const transformedValue = this.doForward(valueN);
 
-            result = transformationCallback === undefined ? transformedValue : transformationCallback(transformedValue, 0);
+            result = transformerCallback === undefined ? transformedValue : transformerCallback(transformedValue, 0);
         } else if (valueOrValues instanceof Sequencer) {
             if (valueOrValues.minValue < 0n) {
                 throw new RangeError(i18next.t("Transformer.minValueMustBeGreaterThanOrEqualToZero", {
@@ -266,11 +191,11 @@ export abstract class Transformer {
                 }));
             }
 
-            result = transformationCallback === undefined ?
+            result = transformerCallback === undefined ?
                 IteratorProxy.from(valueOrValues).map(value => this.doForward(value)) :
-                IteratorProxy.from(valueOrValues).map((value, index) => transformationCallback(this.doForward(value), index));
+                IteratorProxy.from(valueOrValues).map((value, index) => transformerCallback(this.doForward(value), index));
         } else {
-            result = transformationCallback === undefined ?
+            result = transformerCallback === undefined ?
                 IteratorProxy.from(valueOrValues).map((value) => {
                     const valueN = BigInt(value);
 
@@ -283,11 +208,12 @@ export abstract class Transformer {
 
                     this.validate(valueN);
 
-                    return transformationCallback(this.doForward(valueN), index);
+                    return transformerCallback(this.doForward(valueN), index);
                 });
         }
 
-        return result;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type determination is handled above.
+        return result as TransformerOutput<T, U>;
     }
 
     /**

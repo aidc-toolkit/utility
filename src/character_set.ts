@@ -2,6 +2,7 @@ import i18next, { utilityNS } from "./locale/i18n.js";
 import { RegExpValidator } from "./reg_exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
 import { Transformer } from "./transformer.js";
+import type { TransformerCallback, TransformerInput, TransformerOutput } from "./types.js";
 
 /**
  * Exclusion options for validating and creating strings based on character sets.
@@ -292,20 +293,6 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
 }
 
 /**
- * Creation callback, used to convert created string to its final value.
- *
- * @param s
- * Created string.
- *
- * @param index
- * Index in sequence creation (0 for single creation).
- *
- * @returns
- * Final value.
- */
-export type CreationCallback = (s: string, index: number) => string;
-
-/**
  * Character set creator. Maps numeric values to strings using the character set as digits.
  */
 export class CharacterSetCreator extends CharacterSetValidator {
@@ -558,79 +545,33 @@ export class CharacterSetCreator extends CharacterSetValidator {
     }
 
     /**
-     * Create a string by mapping a value to the equivalent characters in the character set across the length of the
+     * Create string(s) by mapping value(s) to the equivalent characters in the character set across the length of the
      * string.
      *
      * @param length
      * Required string length.
      *
-     * @param value
-     * Numeric value of the string.
+     * @param valueOrValues
+     * Numeric value(s) of the string(s).
      *
      * @param exclusion
-     * Strings to be excluded from the range of outputs. See {@link Exclusion} for possible values and their meaning.
+     * String(s) to be excluded from the range of outputs. See {@link Exclusion} for possible values and their meaning.
      *
      * @param tweak
-     * If provided, the numerical value of the string is "tweaked" using an {@link EncryptionTransformer | encryption
-     * transformer}.
+     * If provided, the numerical value of the string(s) is/are "tweaked" using an {@link EncryptionTransformer |
+     * encryption transformer}.
      *
-     * @param creationCallback
-     * If provided, called after the string is constructed to create the final value.
-     *
-     * @returns
-     * String created from the value.
-     */
-    create(length: number, value: number | bigint, exclusion?: Exclusion, tweak?: number | bigint, creationCallback?: CreationCallback): string;
-
-    /**
-     * Create multiple strings by mapping each value to the equivalent characters in the character set across the length
-     * of the string. Equivalent to calling this method for each individual value.
-     *
-     * @param length
-     * Required string length.
-     *
-     * @param values
-     * Numeric values of the strings.
-     *
-     * @param exclusion
-     * Strings to be excluded from the range of outputs. See {@link Exclusion} for possible values and their meaning.
-     *
-     * @param tweak
-     * If provided, the numerical value of the strings are "tweaked" using an {@link EncryptionTransformer | encryption
-     * transformer}.
-     *
-     * @param creationCallback
+     * @param creatorCallback
      * If provided, called after each string is constructed to create the final value.
      *
      * @returns
-     * Iterable iterator over strings created from the values.
+     * String(s) created from the value(s).
      */
-    create(length: number, values: Iterable<number | bigint>, exclusion?: Exclusion, tweak?: number | bigint, creationCallback?: CreationCallback): IterableIterator<string>;
-
-    /**
-     * Create a string or multiple strings. This signature exists to allow similar overloaded methods in other classes
-     * to call this method correctly.
-     *
-     * @param length
-     *
-     * @param valueOrValues
-     *
-     * @param exclusion
-     *
-     * @param tweak
-     *
-     * @param creationCallback
-     *
-     * @returns
-     */
-    create(length: number, valueOrValues: number | bigint | Iterable<number | bigint>, exclusion?: Exclusion, tweak?: number | bigint, creationCallback?: CreationCallback): string | IterableIterator<string>;
-
-    // eslint-disable-next-line jsdoc/require-jsdoc -- Implementation of overloaded signatures.
-    create(length: number, valueOrValues: number | bigint | Iterable<number | bigint>, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creationCallback?: CreationCallback): string | IterableIterator<string> {
+    create<T extends TransformerInput<number | bigint>>(length: number, valueOrValues: T, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creatorCallback?: TransformerCallback<string, string>): TransformerOutput<T, string> {
         this.validateLength(length);
         this.validateExclusion(exclusion);
 
-        // Zero value obviates need for non-null assertion.
+        // Zero value in ternary else obviates need for non-null assertion.
         const allZerosValue = exclusion === Exclusion.AllNumeric ? this._allZerosValues[length] : 0n;
 
         const transformer = Transformer.get(this._exclusionDomains[exclusion][length], tweak);
@@ -661,7 +602,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
                 s = this.character(exclusion === Exclusion.FirstZero ? Number(convertValue % this._characterSetSizeMinusOneN) + 1 : Number(convertValue % this._characterSetSizeN)) + s;
             }
 
-            return creationCallback !== undefined ? creationCallback(s, index) : s;
+            return creatorCallback !== undefined ? creatorCallback(s, index) : s;
         });
     }
 
