@@ -1,6 +1,6 @@
 {
   "name": "@aidc-toolkit/utility",
-  "version": "0.9.6-beta",
+  "version": "0.9.7-beta",
   "description": "Foundational utilities for AIDC Toolkit",
   "type": "module",
   "main": "dist/index.js",
@@ -25,7 +25,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@aidc-toolkit/dev": "^0.9.6-beta",
+    "@aidc-toolkit/dev": "^0.9.7-beta",
     "eslint": "^9.16.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.3.5",
@@ -33,6 +33,6 @@
     "vitest": "^2.1.8"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "^0.9.6-beta"
+    "@aidc-toolkit/core": "^0.9.7-beta"
   }
 }
