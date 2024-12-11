@@ -139,3 +139,31 @@ describe("Encryption", () => {
         expect(Transformer.get(1000000n, 1234567n).forward(987654n)).toBe(639402n);
     });
 });
+
+describe("Non-sequencer", () => {
+    function testIterables(sequencer: Sequencer): void {
+        const nonSequencer = Array.from(sequencer);
+
+        const transformer = Transformer.get(1000n, 1234n);
+
+        const sequencerForward = transformer.forward(sequencer);
+        const nonSequencerForward = transformer.forward(nonSequencer);
+
+        const nonSequencerIterator = nonSequencerForward[Symbol.iterator]();
+
+        for (const sequencerValue of sequencerForward) {
+            const nonSequencerNext = nonSequencerIterator.next();
+
+            expect(nonSequencerNext.done).not.toBe(true);
+            expect(nonSequencerNext.value).toBe(sequencerValue);
+        }
+    }
+
+    test("Ascending", () => {
+        testIterables(new Sequencer(0, 10));
+    });
+
+    test("Descending", () => {
+        testIterables(new Sequencer(9, -10));
+    });
+});

@@ -1,7 +1,75 @@
-import { IteratorProxy } from "./iterator_proxy.js";
 import i18next, { utilityNS } from "./locale/i18n.js";
 import { Sequencer } from "./sequencer.js";
-import type { TransformerCallback, TransformerInput, TransformerOutput } from "./types.js";
+
+/**
+ * Transformer input, one of:
+ *
+ * - T (primitive type)
+ * - Iterable<T>
+ *
+ * @template T
+ * Primitive type.
+ */
+export type TransformerInput<T extends string | number | bigint | boolean> = T | Iterable<T>;
+
+/**
+ * Transformer callback, used to convert transformed value to its final value.
+ *
+ * @template TInput
+ * Type of input to callback.
+ *
+ * @template TOutput
+ * Type of output to callback.
+ *
+ * @param input
+ * Input value.
+ *
+ * @param index
+ * Index in sequence (0 for single transformation).
+ *
+ * @returns
+ * Output value.
+ */
+export type TransformerCallback<TInput, TOutput> = (input: TInput, index: number) => TOutput;
+
+/**
+ * Transformer output, based on transformer input:
+ *
+ * - If type T is primitive, result is type TOutput.
+ * - If type T is Iterable, result is type Iterable<TOutput>.
+ *
+ * @template T
+ * Transformer input type.
+ *
+ * @template TOutput
+ * Output base type.
+ */
+export type TransformerOutput<T extends TransformerInput<string | number | bigint | boolean>, TOutput> =
+    T extends (T extends TransformerInput<infer TInput> ? TInput : never) ? TOutput : Iterable<TOutput>;
+
+/**
+ * Transform an iterable by applying a transformer callback to each entry.
+ *
+ * @param iterable
+ * Input iterable.
+ *
+ * @param transformerCallback
+ * Callback to transform input value to output value.
+ *
+ * @returns
+ * Output iterable.
+ */
+export function transformIterable<TInput, TOutput>(iterable: Iterable<TInput>, transformerCallback: TransformerCallback<TInput, TOutput>): Iterable<TOutput> {
+    return {
+        * [Symbol.iterator](): Generator<TOutput> {
+            let index = 0;
+
+            for (const input of iterable) {
+                yield transformerCallback(input, index++);
+            }
+        }
+    };
+}
 
 /**
  * Transformer that transforms values in a numeric domain to values in a range equal to the domain or to another range
@@ -165,7 +233,7 @@ export abstract class Transformer {
     // eslint-disable-next-line jsdoc/require-jsdoc -- Implementation of overloaded signatures.
     forward<T extends TransformerInput<number | bigint>, U>(valueOrValues: T, transformerCallback?: TransformerCallback<bigint, U>): TransformerOutput<T, U> {
         // TODO Refactor type when https://github.com/microsoft/TypeScript/pull/56941 released.
-        let result: bigint | U | IterableIterator<bigint> | IterableIterator<U>;
+        let result: bigint | U | Iterable<bigint> | Iterable<U>;
 
         if (typeof valueOrValues !== "object") {
             const valueN = BigInt(valueOrValues);
@@ -191,25 +259,29 @@ export abstract class Transformer {
                 }));
             }
 
-            result = transformerCallback === undefined ?
-                IteratorProxy.from(valueOrValues).map(value => this.doForward(value)) :
-                IteratorProxy.from(valueOrValues).map((value, index) => transformerCallback(this.doForward(value), index));
+            if (transformerCallback === undefined) {
+                result = transformIterable(valueOrValues, value => this.doForward(value));
+            } else {
+                result = transformIterable(valueOrValues, (value, index) => transformerCallback(this.doForward(value), index));
+            }
         } else {
-            result = transformerCallback === undefined ?
-                IteratorProxy.from(valueOrValues).map((value) => {
+            if (transformerCallback === undefined) {
+                result = transformIterable(valueOrValues, (value) => {
                     const valueN = BigInt(value);
 
                     this.validate(valueN);
 
                     return this.doForward(valueN);
-                }) :
-                IteratorProxy.from(valueOrValues).map((value, index) => {
+                });
+            } else {
+                result = transformIterable(valueOrValues, (value, index) => {
                     const valueN = BigInt(value);
 
                     this.validate(valueN);
 
                     return transformerCallback(this.doForward(valueN), index);
                 });
+            }
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type determination is handled above.

@@ -96,9 +96,6 @@ export class Sequencer implements Iterable<bigint> {
     /**
      * Iterable implementation.
      *
-     * @returns
-     * Generator.
-     *
      * @yields
      * Next value in sequence.
      */

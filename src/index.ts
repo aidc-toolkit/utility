@@ -1,6 +1,4 @@
 export { utilityNS } from "./locale/i18n.js";
-export type * from "./types.js";
-export * from "./iterator_proxy.js";
 export * from "./sequencer.js";
 export * from "./transformer.js";
 export type * from "./string.js";

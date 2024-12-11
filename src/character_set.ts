@@ -1,8 +1,7 @@
 import i18next, { utilityNS } from "./locale/i18n.js";
 import { RegExpValidator } from "./reg_exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
-import { Transformer } from "./transformer.js";
-import type { TransformerCallback, TransformerInput, TransformerOutput } from "./types.js";
+import { Transformer, type TransformerCallback, type TransformerInput, type TransformerOutput } from "./transformer.js";
 
 /**
  * Exclusion options for validating and creating strings based on character sets.
