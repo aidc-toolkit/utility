@@ -1,7 +1,7 @@
 /**
- * Sequencer. Defines an ascending or descending sequence of big integers implemented as an iterable iterator.
+ * Sequencer. Defines an ascending or descending sequence of big integers implemented as an iterable.
  */
-export class Sequencer implements Iterable<bigint>, IterableIterator<bigint> {
+export class Sequencer implements Iterable<bigint> {
     /**
      * Start value (inclusive).
      */
@@ -33,11 +33,6 @@ export class Sequencer implements Iterable<bigint>, IterableIterator<bigint> {
     private readonly _maxValue: bigint;
 
     /**
-     * Next value.
-     */
-    private _nextValue: bigint;
-
-    /**
      * Constructor.
      *
      * @param startValue
@@ -52,9 +47,7 @@ export class Sequencer implements Iterable<bigint>, IterableIterator<bigint> {
         this._endValue = this._startValue + BigInt(count);
         this._count = count;
 
-        const ascending = count >= 0;
-
-        if (ascending) {
+        if (count >= 0) {
             this._nextDelta = 1n;
             this._minValue = this._startValue;
             this._maxValue = this._endValue - 1n;
@@ -63,8 +56,6 @@ export class Sequencer implements Iterable<bigint>, IterableIterator<bigint> {
             this._minValue = this._endValue + 1n;
             this._maxValue = this._startValue;
         }
-
-        this._nextValue = this._startValue;
     }
 
     /**
@@ -106,44 +97,14 @@ export class Sequencer implements Iterable<bigint>, IterableIterator<bigint> {
      * Iterable implementation.
      *
      * @returns
-     * this
-     */
-    [Symbol.iterator](): this {
-        return this;
-    }
-
-    /**
-     * Iterator implementation.
+     * Generator.
      *
-     * @returns
-     * Iterator result. If iterator is exhausted, the value is absolute value of the count.
+     * @yields
+     * Next value in sequence.
      */
-    next(): IteratorResult<bigint, number> {
-        const done = this._nextValue === this._endValue;
-
-        let result: IteratorResult<bigint, number>;
-
-        if (!done) {
-            result = {
-                value: this._nextValue
-            };
-
-            this._nextValue += this._nextDelta;
-        } else {
-            result = {
-                done: true,
-                value: Math.abs(this._count)
-            };
+    * [Symbol.iterator](): Generator<bigint> {
+        for (let value = this._startValue; value !== this._endValue; value += this._nextDelta) {
+            yield value;
         }
-
-        return result;
-    }
-
-    /**
-     * Reset the iterator.
-     */
-    reset(): void {
-        // Reset simply returns to the start.
-        this._nextValue = this._startValue;
     }
 }

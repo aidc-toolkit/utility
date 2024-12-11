@@ -22,7 +22,7 @@ describe("Sequence", () => {
         expect(sequencer2.maxValue).toBe(29n);
     });
 
-    test("Iteration", () => {
+    function iterate(): void {
         let expectedValue: bigint;
         let count: number;
 
@@ -49,24 +49,13 @@ describe("Sequence", () => {
         }
 
         expect(count).toBe(20);
+    }
+
+    test("Iteration", () => {
+        iterate();
     });
 
-    test("Reset", () => {
-        let expectedValue: bigint;
-        let count: number;
-
-        expectedValue = 10n;
-        count = 0;
-
-        sequencer1.reset();
-
-        for (const value of Iterator.from(sequencer1)) {
-            expect(value).toBe(expectedValue);
-
-            expectedValue++;
-            count++;
-        }
-
-        expect(count).toBe(20);
+    test("Repeat", () => {
+        iterate();
     });
 });
