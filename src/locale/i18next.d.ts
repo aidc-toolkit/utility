@@ -1,4 +1,4 @@
-import type { localeStrings } from "./en/locale_strings.js";
+import type { localeStrings } from "./en/locale-strings.js";
 
 /**
  * Internationalization module.

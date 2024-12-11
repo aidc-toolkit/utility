@@ -1,5 +1,5 @@
 import i18next, { utilityNS } from "./locale/i18n.js";
-import { RegExpValidator } from "./reg_exp.js";
+import { RegExpValidator } from "./reg-exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
 import { Transformer, type TransformerCallback, type TransformerInput, type TransformerOutput } from "./transformer.js";
 

@@ -6,7 +6,7 @@
     <vitest-options value="--run" />
     <envs />
     <scope-kind value="TEST_FILE" />
-    <test-file value="$PROJECT_DIR$/test/character_set.test.ts" />
+    <test-file value="$PROJECT_DIR$/test/character-set.test.ts" />
     <method v="2" />
   </configuration>
 </component>
