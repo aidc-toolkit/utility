@@ -1,4 +1,4 @@
-import type { localeStrings } from "./en/locale-strings.js";
+import type { UtilityLocaleStrings } from "./i18n.js";
 
 /**
  * Internationalization module.
@@ -8,9 +8,9 @@ declare module "i18next" {
      * Custom type options for this package.
      */
     interface CustomTypeOptions {
+        defaultNS: "aidct_utility";
         resources: {
-            // Extract the type from the English locale strings object.
-            aidct_utility: typeof localeStrings;
+            aidct_utility: UtilityLocaleStrings;
         };
     }
 }

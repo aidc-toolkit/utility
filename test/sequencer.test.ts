@@ -1,8 +1,8 @@
-import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
+import { I18NEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { Sequencer } from "../src/index.js";
+import { i18nUtilityInit, Sequencer } from "../src/index.js";
 
-await i18nInit(I18NEnvironment.CLI);
+await i18nUtilityInit(I18NEnvironment.CLI);
 
 describe("Sequence", () => {
     const sequencer1 = new Sequencer(10, 20);

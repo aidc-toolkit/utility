@@ -1,4 +1,4 @@
-import i18next, { utilityNS } from "./locale/i18n.js";
+import { i18nextUtility } from "./locale/i18n.js";
 import { Sequencer } from "./sequencer.js";
 
 /**
@@ -109,8 +109,7 @@ export abstract class Transformer {
         this._domain = BigInt(domain);
 
         if (this._domain <= 0n) {
-            throw new RangeError(i18next.t("Transformer.domainMustBeGreaterThanZero", {
-                ns: utilityNS,
+            throw new RangeError(i18nextUtility.t("Transformer.domainMustBeGreaterThanZero", {
                 domain
             }));
         }
@@ -168,15 +167,13 @@ export abstract class Transformer {
      */
     private validate(value: bigint): void {
         if (value < 0n) {
-            throw new RangeError(i18next.t("Transformer.valueMustBeGreaterThanOrEqualToZero", {
-                ns: utilityNS,
+            throw new RangeError(i18nextUtility.t("Transformer.valueMustBeGreaterThanOrEqualToZero", {
                 value
             }));
         }
 
         if (value >= this.domain) {
-            throw new RangeError(i18next.t("Transformer.valueMustBeLessThan", {
-                ns: utilityNS,
+            throw new RangeError(i18nextUtility.t("Transformer.valueMustBeLessThan", {
                 value,
                 domain: this.domain
             }));
@@ -245,15 +242,13 @@ export abstract class Transformer {
             result = transformerCallback === undefined ? transformedValue : transformerCallback(transformedValue, 0);
         } else if (valueOrValues instanceof Sequencer) {
             if (valueOrValues.minValue < 0n) {
-                throw new RangeError(i18next.t("Transformer.minValueMustBeGreaterThanOrEqualToZero", {
-                    ns: utilityNS,
+                throw new RangeError(i18nextUtility.t("Transformer.minValueMustBeGreaterThanOrEqualToZero", {
                     minValue: valueOrValues.minValue
                 }));
             }
 
             if (valueOrValues.maxValue >= this.domain) {
-                throw new RangeError(i18next.t("Transformer.maxValueMustBeLessThan", {
-                    ns: utilityNS,
+                throw new RangeError(i18nextUtility.t("Transformer.maxValueMustBeLessThan", {
                     maxValue: valueOrValues.maxValue,
                     domain: this.domain
                 }));
@@ -414,8 +409,7 @@ export class EncryptionTransformer extends Transformer {
         super(domain);
 
         if (tweak < 0n) {
-            throw new RangeError(i18next.t("Transformer.tweakMustBeGreaterThanOrEqualToZero", {
-                ns: utilityNS,
+            throw new RangeError(i18nextUtility.t("Transformer.tweakMustBeGreaterThanOrEqualToZero", {
                 tweak
             }));
         }

@@ -1,4 +1,4 @@
-import { I18NEnvironment, i18nInit } from "@aidc-toolkit/core";
+import { I18NEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
 import {
     ALPHABETIC_CREATOR,
@@ -6,11 +6,12 @@ import {
     CharacterSetCreator,
     Exclusion,
     HEXADECIMAL_CREATOR,
+    i18nUtilityInit,
     NUMERIC_CREATOR,
     Sequencer
 } from "../src/index.js";
 
-await i18nInit(I18NEnvironment.CLI);
+await i18nUtilityInit(I18NEnvironment.CLI);
 
 function testCharacterSetCreator(name: string, characterSetCreator: CharacterSetCreator, characterSetSize: number, length: number, excludeFirstZero: boolean, excludeAllNumeric: boolean): void {
     describe(name, () => {

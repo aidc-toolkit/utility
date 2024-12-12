@@ -1,4 +1,4 @@
-import i18next, { utilityNS } from "./locale/i18n.js";
+import { i18nextUtility } from "./locale/i18n.js";
 import type { StringValidator } from "./string.js";
 
 /**
@@ -51,9 +51,8 @@ export class RecordValidator<T> implements StringValidator {
      * Record key.
      */
     validate(key: string): void {
-        if (this.record[key] === undefined) {
-            throw new RangeError(i18next.t("RecordValidator.typeNameKeyNotFound", {
-                ns: utilityNS,
+        if (!(key in this.record)) {
+            throw new RangeError(i18nextUtility.t("RecordValidator.typeNameKeyNotFound", {
                 typeName: this.typeName,
                 key
             }));

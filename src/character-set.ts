@@ -1,4 +1,4 @@
-import i18next, { utilityNS } from "./locale/i18n.js";
+import { i18nextUtility } from "./locale/i18n.js";
 import { RegExpValidator } from "./reg-exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
 import { Transformer, type TransformerCallback, type TransformerInput, type TransformerOutput } from "./transformer.js";
@@ -71,9 +71,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
          * Error message.
          */
         protected override createErrorMessage(_s: string): string {
-            return i18next.t("CharacterSetValidator.stringMustNotBeAllNumeric", {
-                ns: utilityNS
-            });
+            return i18nextUtility.t("CharacterSetValidator.stringMustNotBeAllNumeric");
         }
     }(/\D/);
 
@@ -199,8 +197,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      */
     protected validateExclusion(exclusion: Exclusion): void {
         if (exclusion !== Exclusion.None && !this._exclusionSupport.includes(exclusion)) {
-            throw new RangeError(i18next.t("CharacterSetValidator.exclusionNotSupported", {
-                ns: utilityNS,
+            throw new RangeError(i18nextUtility.t("CharacterSetValidator.exclusionNotSupported", {
                 exclusion
             }));
         }
@@ -226,15 +223,13 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
             let errorMessage: string;
 
             if (maximumLength !== undefined && maximumLength === minimumLength) {
-                errorMessage = i18next.t(validation?.component === undefined ? "CharacterSetValidator.lengthMustBeEqualTo" : "CharacterSetValidator.lengthOfComponentMustBeEqualTo", {
-                    ns: utilityNS,
+                errorMessage = i18nextUtility.t(validation?.component === undefined ? "CharacterSetValidator.lengthMustBeEqualTo" : "CharacterSetValidator.lengthOfComponentMustBeEqualTo", {
                     component: CharacterSetValidator.componentToString(validation?.component),
                     length,
                     exactLength: minimumLength
                 });
             } else {
-                errorMessage = i18next.t(validation?.component === undefined ? "CharacterSetValidator.lengthMustBeGreaterThanOrEqualTo" : "CharacterSetValidator.lengthOfComponentMustBeGreaterThanOrEqualTo", {
-                    ns: utilityNS,
+                errorMessage = i18nextUtility.t(validation?.component === undefined ? "CharacterSetValidator.lengthMustBeGreaterThanOrEqualTo" : "CharacterSetValidator.lengthOfComponentMustBeGreaterThanOrEqualTo", {
                     component: CharacterSetValidator.componentToString(validation?.component),
                     length,
                     minimumLength
@@ -245,8 +240,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
         }
 
         if (maximumLength !== undefined && length > maximumLength) {
-            throw new RangeError(i18next.t(validation?.component === undefined ? "CharacterSetValidator.lengthMustBeLessThanOrEqualTo" : "CharacterSetValidator.lengthOfComponentMustBeLessThanOrEqualTo", {
-                ns: utilityNS,
+            throw new RangeError(i18nextUtility.t(validation?.component === undefined ? "CharacterSetValidator.lengthMustBeLessThanOrEqualTo" : "CharacterSetValidator.lengthOfComponentMustBeLessThanOrEqualTo", {
                 component: CharacterSetValidator.componentToString(validation?.component),
                 length,
                 maximumLength
@@ -257,8 +251,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
         const index = this.characterIndexes(s).findIndex(characterIndex => characterIndex === undefined);
 
         if (index !== -1) {
-            throw new RangeError(i18next.t(validation?.component === undefined ? "CharacterSetValidator.invalidCharacterAtPosition" : "CharacterSetValidator.invalidCharacterAtPositionOfComponent", {
-                ns: utilityNS,
+            throw new RangeError(i18nextUtility.t(validation?.component === undefined ? "CharacterSetValidator.invalidCharacterAtPosition" : "CharacterSetValidator.invalidCharacterAtPositionOfComponent", {
                 component: CharacterSetValidator.componentToString(validation?.component),
                 c: s.charAt(index),
                 position: index + (validation?.positionOffset ?? 0) + 1
@@ -274,8 +267,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
 
                 case Exclusion.FirstZero:
                     if (s.startsWith("0")) {
-                        throw new RangeError(i18next.t(validation.component === undefined ? "CharacterSetValidator.invalidCharacterAtPosition" : "CharacterSetValidator.invalidCharacterAtPositionOfComponent", {
-                            ns: utilityNS,
+                        throw new RangeError(i18nextUtility.t(validation.component === undefined ? "CharacterSetValidator.invalidCharacterAtPosition" : "CharacterSetValidator.invalidCharacterAtPositionOfComponent", {
                             component: CharacterSetValidator.componentToString(validation.component),
                             c: "0",
                             position: (validation.positionOffset ?? 0) + 1
@@ -383,9 +375,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
 
         if (exclusionSupport.includes(Exclusion.FirstZero)) {
             if (characterSet[0] !== "0") {
-                throw new RangeError(i18next.t("CharacterSetValidator.firstZeroFirstCharacter", {
-                    ns: utilityNS
-                }));
+                throw new RangeError(i18nextUtility.t("CharacterSetValidator.firstZeroFirstCharacter"));
             }
 
             const exclusionFirstZeroDomains = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
@@ -416,9 +406,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
                 // Make sure that all numeric characters are present and in sequence.
                 for (const numberIndex of numberIndexes) {
                     if (numberIndex === undefined || numberIndex !== expectedNumberIndex) {
-                        throw new RangeError(i18next.t("CharacterSetValidator.allNumericAllNumericCharacters", {
-                            ns: utilityNS
-                        }));
+                        throw new RangeError(i18nextUtility.t("CharacterSetValidator.allNumericAllNumericCharacters"));
                     }
 
                     expectedNumberIndex = numberIndex + 1;
@@ -490,9 +478,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
         if (length === 0) {
             if (!shiftForward && value < 10n) {
                 // If calculation gets this far, string is all-numeric.
-                throw new RangeError(i18next.t("CharacterSetValidator.stringMustNotBeAllNumeric", {
-                    ns: utilityNS
-                }));
+                throw new RangeError(i18nextUtility.t("CharacterSetValidator.stringMustNotBeAllNumeric"));
             }
 
             // Now dealing with individual characters; shift by 10 to skip numeric characters.
@@ -527,16 +513,14 @@ export class CharacterSetCreator extends CharacterSetValidator {
      */
     private validateLength(length: number): void {
         if (length < 0) {
-            throw new RangeError(i18next.t("CharacterSetValidator.lengthMustBeGreaterThanOrEqualTo", {
-                ns: utilityNS,
+            throw new RangeError(i18nextUtility.t("CharacterSetValidator.lengthMustBeGreaterThanOrEqualTo", {
                 length,
                 minimumLength: 0
             }));
         }
 
         if (length > CharacterSetCreator.MAXIMUM_STRING_LENGTH) {
-            throw new RangeError(i18next.t("CharacterSetValidator.lengthMustBeLessThanOrEqualTo", {
-                ns: utilityNS,
+            throw new RangeError(i18nextUtility.t("CharacterSetValidator.lengthMustBeLessThanOrEqualTo", {
                 length,
                 maximumLength: CharacterSetCreator.MAXIMUM_STRING_LENGTH
             }));
@@ -632,8 +616,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
         // Convert string to its value character by character.
         let value = this.characterIndexes(s).reduce((accumulator, characterIndex, index) => {
             if (characterIndex === undefined) {
-                throw new RangeError(i18next.t("CharacterSetValidator.invalidCharacterAtPosition", {
-                    ns: utilityNS,
+                throw new RangeError(i18nextUtility.t("CharacterSetValidator.invalidCharacterAtPosition", {
                     c: s.charAt(index),
                     position: index + 1
                 }));
@@ -643,8 +626,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
 
             if (index === 0 && exclusion === Exclusion.FirstZero) {
                 if (characterIndex === 0) {
-                    throw new RangeError(i18next.t("CharacterSetValidator.invalidCharacterAtPosition", {
-                        ns: utilityNS,
+                    throw new RangeError(i18nextUtility.t("CharacterSetValidator.invalidCharacterAtPosition", {
                         c: "0",
                         position: 1
                     }));
