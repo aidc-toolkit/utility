@@ -383,11 +383,6 @@ export class EncryptionTransformer extends Transformer {
     private readonly _domainBytes: number;
 
     /**
-     * Tweak.
-     */
-    private readonly _tweak: bigint;
-
-    /**
      * Xor bytes array generated from the domain and tweak.
      */
     private readonly _xorBytes: Uint8Array;
@@ -433,14 +428,13 @@ export class EncryptionTransformer extends Transformer {
         }
 
         this._domainBytes = domainBytes;
-        this._tweak = BigInt(tweak);
 
         const xorBytes = new Array<number>();
         const bits = new Array<number>();
         const inverseBits = new Array<number>();
 
         // Key is the product of domain, tweak, and an 8-digit prime to force at least four rounds.
-        for (let reducedKey = this.domain * this.tweak * 603868999n; reducedKey !== 0n; reducedKey = reducedKey >> 8n) {
+        for (let reducedKey = this.domain * BigInt(tweak) * 603868999n; reducedKey !== 0n; reducedKey = reducedKey >> 8n) {
             // Extract least-significant byte.
             const keyByte = Number(reducedKey & 0xFFn);
 
@@ -474,13 +468,6 @@ export class EncryptionTransformer extends Transformer {
             this._inverseBits = new Uint8Array(inverseBits);
             this._rounds = xorBytes.length;
         }
-    }
-
-    /**
-     * Get the tweak.
-     */
-    get tweak(): bigint {
-        return this._tweak;
     }
 
     /**

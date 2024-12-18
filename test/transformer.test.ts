@@ -83,7 +83,6 @@ describe("Encryption", () => {
         expect(Transformer.get(1000n, 1234n)).toBe(transformer);
 
         expect(transformer.domain).toBe(BigInt(1000n));
-        expect((transformer as EncryptionTransformer).tweak).toBe(BigInt(1234n));
 
         const transformer0 = Transformer.get(1000, 0);
 
