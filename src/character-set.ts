@@ -585,7 +585,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
                 s = this.character(exclusion === Exclusion.FirstZero ? Number(convertValue % this._characterSetSizeMinusOneN) + 1 : Number(convertValue % this._characterSetSizeN)) + s;
             }
 
-            return creatorCallback !== undefined ? creatorCallback(s, index) : s;
+            return creatorCallback === undefined ? s : creatorCallback(s, index);
         });
     }
 

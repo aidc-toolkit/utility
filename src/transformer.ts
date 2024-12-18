@@ -203,6 +203,42 @@ export abstract class Transformer {
     protected abstract doForward(value: bigint): bigint;
 
     /**
+     * Validate that a value is within the domain and do the work of transforming it forward.
+     *
+     * @param value
+     * Value.
+     *
+     * @returns
+     * Transformed value.
+     */
+    private validateDoForward(value: number | bigint): bigint {
+        const valueN = BigInt(value);
+
+        this.validate(valueN);
+
+        return this.doForward(valueN);
+    }
+
+    /**
+     * Validate that a value is within the domain, do the work of transforming it forward, and apply a callback.
+     *
+     * @param transformerCallback
+     * Called after each value is transformed to convert it to its final value.
+     *
+     * @param value
+     * Value.
+     *
+     * @param index
+     * Index in sequence (0 for single transformation).
+     *
+     * @returns
+     * Transformed value.
+     */
+    private validateDoForwardCallback<TOutput>(transformerCallback: TransformerCallback<bigint, TOutput>, value: number | bigint, index: number): TOutput {
+        return transformerCallback(this.validateDoForward(value), index);
+    };
+
+    /**
      * Transform value(s) forward.
      *
      * @template TTransformerInput
@@ -244,13 +280,7 @@ export abstract class Transformer {
         let result: bigint | TOutput | Iterable<bigint> | Iterable<TOutput>;
 
         if (typeof valueOrValues !== "object") {
-            const valueN = BigInt(valueOrValues);
-
-            this.validate(valueN);
-
-            const transformedValue = this.doForward(valueN);
-
-            result = transformerCallback === undefined ? transformedValue : transformerCallback(transformedValue, 0);
+            result = transformerCallback === undefined ? this.validateDoForward(valueOrValues) : this.validateDoForwardCallback(transformerCallback, valueOrValues, 0);
         } else if (valueOrValues instanceof Sequence) {
             if (valueOrValues.minimumValue < 0n) {
                 throw new RangeError(i18nextUtility.t("Transformer.minimumValueMustBeGreaterThanOrEqualToZero", {
@@ -265,29 +295,9 @@ export abstract class Transformer {
                 }));
             }
 
-            if (transformerCallback === undefined) {
-                result = transformIterable(valueOrValues, value => this.doForward(value));
-            } else {
-                result = transformIterable(valueOrValues, (value, index) => transformerCallback(this.doForward(value), index));
-            }
+            result = transformerCallback === undefined ? transformIterable(valueOrValues, value => this.doForward(value)) : transformIterable(valueOrValues, (value, index) => transformerCallback(this.doForward(value), index));
         } else {
-            if (transformerCallback === undefined) {
-                result = transformIterable(valueOrValues, (value) => {
-                    const valueN = BigInt(value);
-
-                    this.validate(valueN);
-
-                    return this.doForward(valueN);
-                });
-            } else {
-                result = transformIterable(valueOrValues, (value, index) => {
-                    const valueN = BigInt(value);
-
-                    this.validate(valueN);
-
-                    return transformerCallback(this.doForward(valueN), index);
-                });
-            }
+            result = transformerCallback === undefined ? transformIterable(valueOrValues, value => this.validateDoForward(value)) : transformIterable(valueOrValues, (value, index) => this.validateDoForwardCallback(transformerCallback, value, index));
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type determination is handled above.
