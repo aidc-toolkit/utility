@@ -12,14 +12,14 @@ describe("Sequence", () => {
         expect(sequence1.startValue).toBe(10n);
         expect(sequence1.endValue).toBe(30n);
         expect(sequence1.count).toBe(20);
-        expect(sequence1.minValue).toBe(10n);
-        expect(sequence1.maxValue).toBe(29n);
+        expect(sequence1.minimumValue).toBe(10n);
+        expect(sequence1.maximumValue).toBe(29n);
 
         expect(sequence2.startValue).toBe(29n);
         expect(sequence2.endValue).toBe(9n);
         expect(sequence2.count).toBe(-20);
-        expect(sequence2.minValue).toBe(10n);
-        expect(sequence2.maxValue).toBe(29n);
+        expect(sequence2.minimumValue).toBe(10n);
+        expect(sequence2.maximumValue).toBe(29n);
     });
 
     function iterate(): void {

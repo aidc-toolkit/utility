@@ -4,8 +4,8 @@ export const localeStrings = {
         tweakMustBeGreaterThanOrEqualToZero: "Le réglage {{tweak}} doit être supérieur ou égal à 0",
         valueMustBeGreaterThanOrEqualToZero: "La valeur {{value}} doit être supérieure ou égale à 0",
         valueMustBeLessThan: "La valeur {{value}} doit être inférieure à {{domain}}",
-        minValueMustBeGreaterThanOrEqualToZero: "La valeur minimale {{minValue}} doit être supérieure ou égale à 0",
-        maxValueMustBeLessThan: "La valeur maximale {{maxValue}} doit être inférieure à {{domain}}"
+        minimumValueMustBeGreaterThanOrEqualToZero: "La valeur minimale {{minimumValue}} doit être supérieure ou égale à 0",
+        maximumValueMustBeLessThan: "La valeur maximale {{maximumValue}} doit être inférieure à {{domain}}"
     },
     RegExpValidator: {
         stringDoesNotMatchPattern: "La chaîne {{s}} ne correspond pas au modèle"

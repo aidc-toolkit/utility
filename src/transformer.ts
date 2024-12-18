@@ -252,15 +252,15 @@ export abstract class Transformer {
 
             result = transformerCallback === undefined ? transformedValue : transformerCallback(transformedValue, 0);
         } else if (valueOrValues instanceof Sequence) {
-            if (valueOrValues.minValue < 0n) {
-                throw new RangeError(i18nextUtility.t("Transformer.minValueMustBeGreaterThanOrEqualToZero", {
-                    minValue: valueOrValues.minValue
+            if (valueOrValues.minimumValue < 0n) {
+                throw new RangeError(i18nextUtility.t("Transformer.minimumValueMustBeGreaterThanOrEqualToZero", {
+                    minimumValue: valueOrValues.minimumValue
                 }));
             }
 
-            if (valueOrValues.maxValue >= this.domain) {
-                throw new RangeError(i18nextUtility.t("Transformer.maxValueMustBeLessThan", {
-                    maxValue: valueOrValues.maxValue,
+            if (valueOrValues.maximumValue >= this.domain) {
+                throw new RangeError(i18nextUtility.t("Transformer.maximumValueMustBeLessThan", {
+                    maximumValue: valueOrValues.maximumValue,
                     domain: this.domain
                 }));
             }

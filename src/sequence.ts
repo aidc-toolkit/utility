@@ -25,12 +25,12 @@ export class Sequence implements Iterable<bigint> {
     /**
      * Minimum value (inclusive).
      */
-    private readonly _minValue: bigint;
+    private readonly _minimumValue: bigint;
 
     /**
      * Maximum value (inclusive).
      */
-    private readonly _maxValue: bigint;
+    private readonly _maximumValue: bigint;
 
     /**
      * Constructor.
@@ -49,12 +49,12 @@ export class Sequence implements Iterable<bigint> {
 
         if (count >= 0) {
             this._nextDelta = 1n;
-            this._minValue = this._startValue;
-            this._maxValue = this._endValue - 1n;
+            this._minimumValue = this._startValue;
+            this._maximumValue = this._endValue - 1n;
         } else {
             this._nextDelta = -1n;
-            this._minValue = this._endValue + 1n;
-            this._maxValue = this._startValue;
+            this._minimumValue = this._endValue + 1n;
+            this._maximumValue = this._startValue;
         }
     }
 
@@ -82,15 +82,15 @@ export class Sequence implements Iterable<bigint> {
     /**
      * Get the minimum value (inclusive).
      */
-    get minValue(): bigint {
-        return this._minValue;
+    get minimumValue(): bigint {
+        return this._minimumValue;
     }
 
     /**
      * Get the maximum value (inclusive).
      */
-    get maxValue(): bigint {
-        return this._maxValue;
+    get maximumValue(): bigint {
+        return this._maximumValue;
     }
 
     /**

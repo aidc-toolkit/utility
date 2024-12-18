@@ -4,8 +4,8 @@ export const localeStrings = {
         tweakMustBeGreaterThanOrEqualToZero: "Tweak {{tweak}} must be greater than or equal to 0",
         valueMustBeGreaterThanOrEqualToZero: "Value {{value}} must be greater than or equal to 0",
         valueMustBeLessThan: "Value {{value}} must be less than {{domain}}",
-        minValueMustBeGreaterThanOrEqualToZero: "Minimum value {{minValue}} must be greater than or equal to 0",
-        maxValueMustBeLessThan: "Maximum value {{maxValue}} must be less than {{domain}}"
+        minimumValueMustBeGreaterThanOrEqualToZero: "Minimum value {{minimumValue}} must be greater than or equal to 0",
+        maximumValueMustBeLessThan: "Maximum value {{maximumValue}} must be less than {{domain}}"
     },
     RegExpValidator: {
         stringDoesNotMatchPattern: "String {{s}} does not match pattern"
