@@ -2,24 +2,29 @@ import { i18nextUtility } from "./locale/i18n.js";
 import { Sequencer } from "./sequencer.js";
 
 /**
- * Transformer input, one of:
- *
- * - T (primitive type)
- * - Iterable<T>
- *
- * @template T
- * Primitive type.
+ * Transformer primitive type.
  */
-export type TransformerInput<T extends string | number | bigint | boolean> = T | Iterable<T>;
+export type TransformerPrimitive = string | number | bigint | boolean;
+
+/**
+ * Transformer input type, one of:
+ *
+ * - TInput (primitive type)
+ * - Iterable<TInput>
+ *
+ * @template TInput
+ * Transformer input primitive type.
+ */
+export type TransformerInput<TInput extends TransformerPrimitive> = TInput | Iterable<TInput>;
 
 /**
  * Transformer callback, used to convert transformed value to its final value.
  *
  * @template TInput
- * Type of input to callback.
+ * Transformer input primitive type.
  *
  * @template TOutput
- * Type of output to callback.
+ * Transformer output type.
  *
  * @param input
  * Input value.
@@ -30,42 +35,48 @@ export type TransformerInput<T extends string | number | bigint | boolean> = T |
  * @returns
  * Output value.
  */
-export type TransformerCallback<TInput, TOutput> = (input: TInput, index: number) => TOutput;
+export type TransformerCallback<TInput extends TransformerPrimitive, TOutput> = (input: TInput, index: number) => TOutput;
 
 /**
  * Transformer output, based on transformer input:
  *
- * - If type T is primitive, result is type TOutput.
- * - If type T is Iterable, result is type Iterable<TOutput>.
+ * - If type TTransformerInput is primitive, result is type TOutput.
+ * - If type TTransformerInput is Iterable, result is type Iterable<TOutput>.
  *
- * @template T
+ * @template TTransformerInput
  * Transformer input type.
  *
  * @template TOutput
  * Output base type.
  */
-export type TransformerOutput<T extends TransformerInput<string | number | bigint | boolean>, TOutput> =
-    T extends (T extends TransformerInput<infer TInput> ? TInput : never) ? TOutput : Iterable<TOutput>;
+export type TransformerOutput<TTransformerInput extends TransformerInput<TransformerPrimitive>, TOutput> =
+    TTransformerInput extends (TTransformerInput extends TransformerInput<infer TInput> ? TInput : never) ? TOutput : Iterable<TOutput>;
 
 /**
- * Transform an iterable by applying a transformer callback to each entry.
+ * Transform an input iterable to an output iterable that applies a transformer callback to each value in the input.
  *
- * @param iterable
- * Input iterable.
+ * @param values
+ * Input values iterable.
  *
  * @param transformerCallback
  * Callback to transform input value to output value.
  *
  * @returns
- * Output iterable.
+ * Output values iterable.
  */
-export function transformIterable<TInput, TOutput>(iterable: Iterable<TInput>, transformerCallback: TransformerCallback<TInput, TOutput>): Iterable<TOutput> {
+export function transformIterable<TInput extends TransformerPrimitive, TOutput>(values: Iterable<TInput>, transformerCallback: TransformerCallback<TInput, TOutput>): Iterable<TOutput> {
     return {
+        /**
+         * Iterable implementation.
+         *
+         * @yields
+         * Next output value.
+         */
         * [Symbol.iterator](): Generator<TOutput> {
             let index = 0;
 
-            for (const input of iterable) {
-                yield transformerCallback(input, index++);
+            for (const value of values) {
+                yield transformerCallback(value, index++);
             }
         }
     };
@@ -194,7 +205,7 @@ export abstract class Transformer {
     /**
      * Transform value(s) forward.
      *
-     * @template T
+     * @template TTransformerInput
      * Value(s) input type.
      *
      * @param valueOrValues
@@ -204,15 +215,15 @@ export abstract class Transformer {
      * @returns
      * Transformed value(s).
      */
-    forward<T extends TransformerInput<number | bigint>>(valueOrValues: T): TransformerOutput<T, bigint>;
+    forward<TTransformerInput extends TransformerInput<number | bigint>>(valueOrValues: TTransformerInput): TransformerOutput<TTransformerInput, bigint>;
 
     /**
      * Transform value(s) forward, optionally applying a transformation.
      *
-     * @template T
+     * @template TTransformerInput
      * Value(s) input type.
      *
-     * @template U
+     * @template TOutput
      * Transformation callback output type.
      *
      * @param valueOrValues
@@ -225,12 +236,12 @@ export abstract class Transformer {
      * @returns
      * Transformed value(s).
      */
-    forward<T extends TransformerInput<number | bigint>, U>(valueOrValues: T, transformerCallback: TransformerCallback<bigint, U>): TransformerOutput<T, U>;
+    forward<TTransformerInput extends TransformerInput<number | bigint>, TOutput>(valueOrValues: TTransformerInput, transformerCallback: TransformerCallback<bigint, TOutput>): TransformerOutput<TTransformerInput, TOutput>;
 
     // eslint-disable-next-line jsdoc/require-jsdoc -- Implementation of overloaded signatures.
-    forward<T extends TransformerInput<number | bigint>, U>(valueOrValues: T, transformerCallback?: TransformerCallback<bigint, U>): TransformerOutput<T, U> {
+    forward<TTransformerInput extends TransformerInput<number | bigint>, TOutput>(valueOrValues: TTransformerInput, transformerCallback?: TransformerCallback<bigint, TOutput>): TransformerOutput<TTransformerInput, TOutput> {
         // TODO Refactor type when https://github.com/microsoft/TypeScript/pull/56941 released.
-        let result: bigint | U | Iterable<bigint> | Iterable<U>;
+        let result: bigint | TOutput | Iterable<bigint> | Iterable<TOutput>;
 
         if (typeof valueOrValues !== "object") {
             const valueN = BigInt(valueOrValues);
@@ -280,7 +291,7 @@ export abstract class Transformer {
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type determination is handled above.
-        return result as TransformerOutput<T, U>;
+        return result as TransformerOutput<TTransformerInput, TOutput>;
     }
 
     /**
