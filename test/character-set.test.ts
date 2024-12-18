@@ -8,7 +8,7 @@ import {
     HEXADECIMAL_CREATOR,
     i18nUtilityInit,
     NUMERIC_CREATOR,
-    Sequencer
+    Sequence
 } from "../src/index.js";
 
 await i18nUtilityInit(I18NEnvironment.CLI);
@@ -65,7 +65,7 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
                     break;
             }
 
-            const sequence = Iterator.from(characterSetCreator.create(length, new Sequencer(0n, domain), exclusion));
+            const sequence = Iterator.from(characterSetCreator.create(length, new Sequence(0n, domain), exclusion));
 
             let previousS = "";
 
@@ -86,7 +86,7 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
 
             expect(() => characterSetCreator.create(length, domain, exclusion)).toThrow(`Value ${domain} must be less than ${domain}`);
 
-            const sparseSequence = Iterator.from(characterSetCreator.create(length, new Sequencer(domain - 1, -domain), exclusion, 123456n));
+            const sparseSequence = Iterator.from(characterSetCreator.create(length, new Sequence(domain - 1, -domain), exclusion, 123456n));
 
             let sequential = true;
             previousS = "~";

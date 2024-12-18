@@ -1,6 +1,6 @@
 import { I18NEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { EncryptionTransformer, i18nUtilityInit, IdentityTransformer, Sequencer, Transformer } from "../src/index.js";
+import { EncryptionTransformer, i18nUtilityInit, IdentityTransformer, Sequence, Transformer } from "../src/index.js";
 
 await i18nUtilityInit(I18NEnvironment.CLI);
 
@@ -11,7 +11,7 @@ function testTransformer(domain: number, tweak?: number, callback?: (value: bigi
 
     const transformedValuesSet = new Set<bigint>();
 
-    Iterator.from(transformer.forward(new Sequencer(0n, domain))).forEach((transformedValue, index) => {
+    Iterator.from(transformer.forward(new Sequence(0n, domain))).forEach((transformedValue, index) => {
         const indexN = BigInt(index);
 
         if (sequential && transformedValue !== indexN) {
@@ -43,11 +43,11 @@ function testTransformer(domain: number, tweak?: number, callback?: (value: bigi
     expect(Array.from(transformer.forward(randomValues))).toStrictEqual(transformedRandomValues);
 
     expect(() => transformer.forward(domain)).toThrow(`Value ${domain} must be less than ${domain}`);
-    expect(() => transformer.forward(new Sequencer(domain, 0))).not.toThrow(RangeError);
-    expect(() => transformer.forward(new Sequencer(domain - 1, 1))).not.toThrow(RangeError);
-    expect(() => transformer.forward(new Sequencer(domain, 1))).toThrow(`Maximum value ${domain} must be less than ${domain}`);
-    expect(() => transformer.forward(new Sequencer(0, -1))).not.toThrow(RangeError);
-    expect(() => transformer.forward(new Sequencer(-1, -1))).toThrow("Minimum value -1 must be greater than or equal to 0");
+    expect(() => transformer.forward(new Sequence(domain, 0))).not.toThrow(RangeError);
+    expect(() => transformer.forward(new Sequence(domain - 1, 1))).not.toThrow(RangeError);
+    expect(() => transformer.forward(new Sequence(domain, 1))).toThrow(`Maximum value ${domain} must be less than ${domain}`);
+    expect(() => transformer.forward(new Sequence(0, -1))).not.toThrow(RangeError);
+    expect(() => transformer.forward(new Sequence(-1, -1))).toThrow("Minimum value -1 must be greater than or equal to 0");
 }
 
 describe("Identity", () => {
@@ -128,7 +128,7 @@ describe("Encryption", () => {
     });
 
     test("Tweak variation", () => {
-        expect(Array.from(Transformer.get(1000, 1235).forward(new Sequencer(0n, 1000)))).not.toStrictEqual(Array.from(Transformer.get(1000, 1234).forward(new Sequencer(0n, 1000))));
+        expect(Array.from(Transformer.get(1000, 1235).forward(new Sequence(0n, 1000)))).not.toStrictEqual(Array.from(Transformer.get(1000, 1234).forward(new Sequence(0n, 1000))));
     });
 
     test("Consistency", () => {
@@ -139,30 +139,30 @@ describe("Encryption", () => {
     });
 });
 
-describe("Non-sequencer", () => {
-    function testIterables(sequencer: Sequencer): void {
-        const nonSequencer = Array.from(sequencer);
+describe("Non-sequence", () => {
+    function testIterables(sequence: Sequence): void {
+        const nonSequence = Array.from(sequence);
 
         const transformer = Transformer.get(1000n, 1234n);
 
-        const sequencerForward = transformer.forward(sequencer);
-        const nonSequencerForward = transformer.forward(nonSequencer);
+        const sequenceForward = transformer.forward(sequence);
+        const nonSequenceForward = transformer.forward(nonSequence);
 
-        const nonSequencerIterator = nonSequencerForward[Symbol.iterator]();
+        const nonSequenceIterator = nonSequenceForward[Symbol.iterator]();
 
-        for (const sequencerValue of sequencerForward) {
-            const nonSequencerNext = nonSequencerIterator.next();
+        for (const sequenceValue of sequenceForward) {
+            const nonSequenceNext = nonSequenceIterator.next();
 
-            expect(nonSequencerNext.done).not.toBe(true);
-            expect(nonSequencerNext.value).toBe(sequencerValue);
+            expect(nonSequenceNext.done).not.toBe(true);
+            expect(nonSequenceNext.value).toBe(sequenceValue);
         }
     }
 
     test("Ascending", () => {
-        testIterables(new Sequencer(0, 10));
+        testIterables(new Sequence(0, 10));
     });
 
     test("Descending", () => {
-        testIterables(new Sequencer(9, -10));
+        testIterables(new Sequence(9, -10));
     });
 });

@@ -1,5 +1,5 @@
 import { i18nextUtility } from "./locale/i18n.js";
-import { Sequencer } from "./sequencer.js";
+import { Sequence } from "./sequence.js";
 
 /**
  * Transformer primitive type.
@@ -209,7 +209,7 @@ export abstract class Transformer {
      * Value(s) input type.
      *
      * @param valueOrValues
-     * Value(s). If this is an instance of {@link Sequencer}, the minimum and maximum values are validated prior to
+     * Value(s). If this is an instance of {@link Sequence}, the minimum and maximum values are validated prior to
      * transformation. Otherwise, the individual value(s) is/are validated at the time of transformation.
      *
      * @returns
@@ -227,7 +227,7 @@ export abstract class Transformer {
      * Transformation callback output type.
      *
      * @param valueOrValues
-     * Value(s). If this is an instance of {@link Sequencer}, the minimum and maximum values are validated prior to
+     * Value(s). If this is an instance of {@link Sequence}, the minimum and maximum values are validated prior to
      * transformation. Otherwise, the individual value(s) is/are validated at the time of transformation.
      *
      * @param transformerCallback
@@ -251,7 +251,7 @@ export abstract class Transformer {
             const transformedValue = this.doForward(valueN);
 
             result = transformerCallback === undefined ? transformedValue : transformerCallback(transformedValue, 0);
-        } else if (valueOrValues instanceof Sequencer) {
+        } else if (valueOrValues instanceof Sequence) {
             if (valueOrValues.minValue < 0n) {
                 throw new RangeError(i18nextUtility.t("Transformer.minValueMustBeGreaterThanOrEqualToZero", {
                     minValue: valueOrValues.minValue

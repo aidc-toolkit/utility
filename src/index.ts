@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 export * from "./locale/i18n.js";
-export * from "./sequencer.js";
+export * from "./sequence.js";
 export * from "./transformer.js";
 export type * from "./string.js";
 export * from "./reg-exp.js";

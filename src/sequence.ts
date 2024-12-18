@@ -1,7 +1,7 @@
 /**
- * Sequencer. Defines an ascending or descending sequence of big integers implemented as an iterable.
+ * Sequence. Defines an ascending or descending sequence of big integers implemented as an iterable.
  */
-export class Sequencer implements Iterable<bigint> {
+export class Sequence implements Iterable<bigint> {
     /**
      * Start value (inclusive).
      */
