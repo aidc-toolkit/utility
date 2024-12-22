@@ -353,10 +353,11 @@ export class IdentityTransformer extends Transformer {
 }
 
 /**
- * Encryption transformer. Values are transformed using repeated shuffle and xor operations. The underlying operations
- * are similar to those found in many cryptography algorithms, particularly AES. While sufficient for obfuscation of
- * numeric sequences (e.g., serial number generation, below), if true format-preserving encryption is required, a more
- * robust algorithm such as {@link https://doi.org/10.6028/NIST.SP.800-38Gr1-draft | FF1} is recommended.
+ * Encryption transformer. Values are transformed using repeated shuffle and xor operations, similar to those found in
+ * many cryptography algorithms, particularly AES. While sufficient for obfuscation of numeric sequences (e.g., serial
+ * number generation, below), if true format-preserving encryption is required, a more robust algorithm such as
+ * {@link https://doi.org/10.6028/NIST.SP.800-38Gr1-draft | FF1} is recommended. Furthermore, no work has been done to
+ * mitigate {@link https://timing.attacks.cr.yp.to/index.html | timing attacks} for key detection.
  *
  * The purpose of the encryption transformer is to generate pseudo-random values in a deterministic manner to obscure
  * the sequence of values generated over time. A typical example is for serial number generation, where knowledge of the
@@ -433,7 +434,7 @@ export class EncryptionTransformer extends Transformer {
         let domainBytes = 0;
 
         // The number of bytes in the domain determines the size of the shuffle and xor operations.
-        for (let reducedDomainMinusOne = this.domain - 1n; reducedDomainMinusOne !== 0n; reducedDomainMinusOne = reducedDomainMinusOne >> 8n) {
+        for (let reducedDomainMinusOne = this.domain - 1n; reducedDomainMinusOne !== 0n; reducedDomainMinusOne >>= 8n) {
             domainBytes++;
         }
 
@@ -444,14 +445,12 @@ export class EncryptionTransformer extends Transformer {
         const inverseBits = new Array<number>();
 
         // Key is the product of domain, tweak, and an 8-digit prime to force at least four rounds.
-        for (let reducedKey = this.domain * BigInt(tweak) * 603868999n; reducedKey !== 0n; reducedKey = reducedKey >> 8n) {
-            // Extract least-significant byte.
-            const keyByte = Number(reducedKey & 0xFFn);
+        for (let reducedKey = this.domain * BigInt(tweak) * 603868999n; reducedKey !== 0n; reducedKey >>= 8n) {
+            // Extract the least significant byte.
+            xorBytes.unshift(Number(BigInt.asUintN(8, reducedKey)));
 
-            xorBytes.unshift(keyByte);
-
-            // Bit number is the key byte mod 8.
-            const bitNumber = keyByte & 0x07;
+            // Bit number is the reduced key mod 8.
+            const bitNumber = Number(BigInt.asUintN(3, reducedKey));
 
             // Bits are applied in reverse order so that they don't correlate directly with the key bytes at the same index.
             bits.push(EncryptionTransformer.BITS[bitNumber]);
@@ -492,13 +491,9 @@ export class EncryptionTransformer extends Transformer {
     private valueToBytes(value: bigint): Uint8Array {
         const bytes = new Uint8Array(this._domainBytes);
 
-        let reducedValue = value;
-
         // Build byte array in reverse order to get as big-endian.
-        for (let index = this._domainBytes - 1; index >= 0; index--) {
-            bytes[index] = Number(reducedValue & 0xFFn);
-
-            reducedValue = reducedValue >> 8n;
+        for (let index = this._domainBytes - 1, reducedValue = value; index >= 0 && reducedValue !== 0n; index--, reducedValue >>= 8n) {
+            bytes[index] = Number(BigInt.asUintN(8, reducedValue));
         }
 
         return bytes;
