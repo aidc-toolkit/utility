@@ -96,7 +96,7 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
             sequenceCount = 0;
 
             sparseSequence.forEach((s, index) => {
-                sequential = sequential && s < previousS;
+                sequential &&= s < previousS;
                 previousS = s;
 
                 expect(s.length).toBe(length);
