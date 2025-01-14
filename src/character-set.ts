@@ -550,7 +550,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * String(s) created from the value(s).
      */
-    create<T extends TransformerInput<number | bigint>>(length: number, valueOrValues: T, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creatorCallback?: TransformerCallback<string, string>): TransformerOutput<T, string> {
+    create<TTransformerInput extends TransformerInput<number | bigint>>(length: number, valueOrValues: TTransformerInput, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creatorCallback?: TransformerCallback<string, string>): TransformerOutput<TTransformerInput, string> {
         this.validateLength(length);
         this.validateExclusion(exclusion);
 
