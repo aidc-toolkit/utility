@@ -172,7 +172,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * Array of indexes for each character or undefined if the character is not in the character set.
      */
     characterIndexes(s: string): ReadonlyArray<number | undefined> {
-        return s.split("").map(c => this._characterSetMap.get(c));
+        return Array.from(s).map(c => this._characterSetMap.get(c));
     }
 
     /**
