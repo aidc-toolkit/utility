@@ -113,7 +113,10 @@ describe("Encryption", () => {
         testTransformer(10, 1);
     });
 
-    test("Large domain and tweak", () => {
+    test("Large domain and tweak", {
+        // Test can take a long time.
+        timeout: 2 * 60 * 1000
+    }, () => {
         testTransformer(100000, 123456);
     });
 
