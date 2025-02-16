@@ -20,22 +20,18 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "build:core": "tsup",
+    "build:core": "tsup src/index.ts --format cjs,esm --dts --clean",
     "build:dev": "npm run build:core && tsc src/index.ts --outDir dist --target esnext --moduleResolution nodenext --module nodenext --emitDeclarationOnly --declaration --declarationMap",
     "build:release": "npm run build:core -- --minify",
+    "publish-dev": "publish-dev",
     "test": "vitest run"
   },
   "devDependencies": {
-    "@aidc-toolkit/dev": "^0.9.12-beta",
-    "eslint": "^9.20.1",
-    "jiti": "^2.4.2",
-    "ts-node": "^10.9.2",
-    "tsup": "^8.3.6",
-    "typescript": "^5.7.3",
+    "@aidc-toolkit/dev": "alpha",
     "vitest": "^3.0.5"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "^0.9.12-beta",
+    "@aidc-toolkit/core": "alpha",
     "i18next": "^24.2.2"
   }
 }
