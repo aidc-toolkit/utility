@@ -20,8 +20,9 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "build-dist": "tsup src/index.ts --clean --format cjs,esm --dts",
-    "build-doc": "npm run build-dist && tsc src/index.ts --outDir dist --target esnext --moduleResolution nodenext --module nodenext --emitDeclarationOnly --declaration --declarationMap",
+    "build:core": "tsup",
+    "build:dev": "npm run build:core && tsc src/index.ts --outDir dist --target esnext --moduleResolution nodenext --module nodenext --emitDeclarationOnly --declaration --declarationMap",
+    "build:release": "npm run build:core -- --minify",
     "test": "vitest run"
   },
   "devDependencies": {
