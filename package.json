@@ -19,10 +19,12 @@
     "url": "https://www.linkedin.com/in/kdean"
   },
   "scripts": {
-    "lint": "eslint .",
-    "build:core": "tsup src/index.ts --format cjs,esm --dts --clean",
-    "build:dev": "npm run build:core && tsc src/index.ts --outDir dist --target esnext --moduleResolution nodenext --module nodenext --emitDeclarationOnly --declaration --declarationMap",
+    "update-aidc-toolkit": "npm update @aidc-toolkit/dev @aidc-toolkit/core",
+    "lint": "eslint",
+    "build:core": "tsup --config node_modules/@aidc-toolkit/dev/tsup.config.ts",
+    "build:dev": "npm run build:core && tsc --project node_modules/@aidc-toolkit/dev/tsconfig-declaration.json",
     "build:release": "npm run build:core -- --minify",
+    "build:doc": "npm run build:dev",
     "publish-dev": "publish-dev",
     "test": "vitest run"
   },
