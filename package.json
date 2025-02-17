@@ -29,11 +29,11 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@aidc-toolkit/dev": "^0.9.14-beta",
+    "@aidc-toolkit/dev": "alpha",
     "vitest": "^3.0.5"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "^0.9.14-beta",
+    "@aidc-toolkit/core": "alpha",
     "i18next": "^24.2.2"
   }
 }
