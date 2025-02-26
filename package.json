@@ -21,16 +21,16 @@
   "scripts": {
     "update-aidc-toolkit": "npm update @aidc-toolkit/dev @aidc-toolkit/core",
     "lint": "eslint",
-    "build:core": "tsup --config node_modules/@aidc-toolkit/dev/tsup.config.ts",
-    "build:dev": "npm run build:core && tsc --project node_modules/@aidc-toolkit/dev/tsconfig-declaration.json",
-    "build:release": "npm run build:core -- --minify",
+    "build:core": "rimraf dist && tsc --project",
+    "build:dev": "npm run build:core -- node_modules/@aidc-toolkit/dev/tsconfig-build-dev.json",
+    "build:release": "npm run build:core -- node_modules/@aidc-toolkit/dev/tsconfig-build.json",
     "build:doc": "npm run build:dev",
     "publish-dev": "publish-dev",
     "test": "vitest run"
   },
   "devDependencies": {
     "@aidc-toolkit/dev": "alpha",
-    "vitest": "^3.0.6"
+    "vitest": "^3.0.7"
   },
   "dependencies": {
     "@aidc-toolkit/core": "alpha",
