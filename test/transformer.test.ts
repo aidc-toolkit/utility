@@ -1,6 +1,6 @@
 import { I18NEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { EncryptionTransformer, i18nUtilityInit, IdentityTransformer, Sequence, Transformer } from "../src/index.js";
+import { EncryptionTransformer, i18nUtilityInit, IdentityTransformer, Sequence, Transformer } from "../src";
 
 await i18nUtilityInit(I18NEnvironment.CLI);
 
@@ -11,22 +11,24 @@ function testTransformer(domain: number, tweak?: number, callback?: (value: bigi
 
     const transformedValuesSet = new Set<bigint>();
 
-    Iterator.from(transformer.forward(new Sequence(0n, domain))).forEach((transformedValue, index) => {
-        const indexN = BigInt(index);
+    let index = 0n;
 
-        if (sequential && transformedValue !== indexN) {
+    for (const transformedValue of transformer.forward(new Sequence(0n, domain))) {
+        if (sequential && transformedValue !== index) {
             sequential = false;
         }
 
         expect(transformedValuesSet.has(transformedValue)).toBe(false);
-        expect(transformer.reverse(transformedValue)).toBe(indexN);
+        expect(transformer.reverse(transformedValue)).toBe(index);
 
         transformedValuesSet.add(transformedValue);
 
         if (callback !== undefined) {
-            callback(indexN, transformedValue);
+            callback(index, transformedValue);
         }
-    });
+
+        index++;
+    }
 
     expect(sequential).toBe(tweak === undefined);
 

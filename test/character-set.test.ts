@@ -9,7 +9,7 @@ import {
     i18nUtilityInit,
     NUMERIC_CREATOR,
     Sequence
-} from "../src/index.js";
+} from "../src";
 
 await i18nUtilityInit(I18NEnvironment.CLI);
 
@@ -65,13 +65,13 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
                     break;
             }
 
-            const sequence = Iterator.from(characterSetCreator.create(length, new Sequence(0n, domain), exclusion));
+            const sequence = characterSetCreator.create(length, new Sequence(0n, domain), exclusion);
 
             let previousS = "";
 
-            let sequenceCount = 0;
+            let index = 0;
 
-            sequence.forEach((s, index) => {
+            for (const s of sequence) {
                 expect(s > previousS).toBe(true);
                 previousS = s;
 
@@ -79,23 +79,23 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
 
                 expect(characterSetCreator.valueFor(s, exclusion)).toBe(BigInt(index));
 
-                sequenceCount++;
-            });
+                index++;
+            }
 
-            expect(sequenceCount).toBe(domain);
+            expect(index).toBe(domain);
 
             expect(() => characterSetCreator.create(length, domain, exclusion)).toThrow(`Value ${domain} must be less than ${domain}`);
 
-            const sparseSequence = Iterator.from(characterSetCreator.create(length, new Sequence(domain - 1, -domain), exclusion, 123456n));
+            const sparseSequence = characterSetCreator.create(length, new Sequence(domain - 1, -domain), exclusion, 123456n);
 
             let sequential = true;
             previousS = "~";
 
             const sequenceSet = new Set<string>();
 
-            sequenceCount = 0;
+            index = 0;
 
-            sparseSequence.forEach((s, index) => {
+            for (const s of sparseSequence) {
                 sequential &&= s < previousS;
                 previousS = s;
 
@@ -106,11 +106,11 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
 
                 expect(characterSetCreator.valueFor(s, exclusion, 123456n)).toBe(BigInt(domain - index - 1));
 
-                sequenceCount++;
-            });
+                index++;
+            }
 
             expect(sequential).toBe(false);
-            expect(sequenceCount).toBe(domain);
+            expect(index).toBe(domain);
 
             const randomValues = new Array<bigint>();
             const straightRandomValues = new Array<string>();

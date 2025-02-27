@@ -1,6 +1,6 @@
 import { I18NEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { i18nUtilityInit, RegExpValidator } from "../src/index.js";
+import { i18nUtilityInit, RegExpValidator } from "../src";
 
 await i18nUtilityInit(I18NEnvironment.CLI);
 
