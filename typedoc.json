@@ -4,8 +4,6 @@
     "@aidc-toolkit/dev/typedoc.json"
   ],
   "name": "Utility",
-  "entryPoints": [
-    "src/index.ts"
-  ],
+  "tsconfig": "node_modules/@aidc-toolkit/dev/tsconfig-build-dev.json",
   "gitRevision": "main"
 }
