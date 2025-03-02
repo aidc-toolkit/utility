@@ -137,12 +137,18 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
             expect(() => characterSetCreator.create(41, 0)).toThrow("Length 41 must be less than or equal to 40");
         });
 
-        test("Create sequence", () => {
+        test("Create sequence", {
+            // Test can take a moderate amount of time.
+            timeout: 10 * 1000
+        }, () => {
             testCreate(Exclusion.None);
         });
 
         if (excludeFirstZero) {
-            test("Create sequence, exclude first zero", () => {
+            test("Create sequence, exclude first zero", {
+                // Test can take a moderate amount of time.
+                timeout: 10 * 1000
+            }, () => {
                 testCreate(Exclusion.FirstZero);
 
                 expect(() => characterSetCreator.valueFor("0000", Exclusion.FirstZero)).toThrow("Invalid character '0' at position 1");
@@ -151,7 +157,10 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
         }
 
         if (excludeAllNumeric) {
-            test("Create sequence, exclude all numeric", () => {
+            test("Create sequence, exclude all numeric", {
+                // Test can take a moderate amount of time.
+                timeout: 10 * 1000
+            }, () => {
                 testCreate(Exclusion.AllNumeric);
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Nine is known to be present in the character set.
