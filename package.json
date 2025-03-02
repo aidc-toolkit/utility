@@ -19,13 +19,11 @@
     "url": "https://www.linkedin.com/in/kdean"
   },
   "scripts": {
-    "update-aidc-toolkit": "npm update @aidc-toolkit/dev @aidc-toolkit/core",
     "lint": "eslint",
     "build:core": "rimraf dist && tsc --project",
     "build:dev": "npm run build:core -- node_modules/@aidc-toolkit/dev/tsconfig-build-dev.json",
     "build:release": "npm run build:core -- node_modules/@aidc-toolkit/dev/tsconfig-build.json",
     "build:doc": "npm run build:dev",
-    "publish-dev": "publish-dev",
     "test": "vitest run"
   },
   "devDependencies": {
