@@ -23,7 +23,6 @@ export const localeStrings = {
         invalidCharacterAtPosition: "Invalid character '{{c}}' at position {{position, number}}",
         invalidCharacterAtPositionOfComponent: "Invalid character '{{c}}' at position {{position, number}} of {{component}}",
         exclusionNotSupported: "Exclusion value of {{exclusion, number}} is not supported",
-        invalidTweakWithAllNumericExclusion: "Tweak must not be used with all-numeric exclusion",
         endSequenceValueMustBeLessThanOrEqualTo: "End sequence value (start sequence value + count - 1) must be less than {{domain, number}}"
     },
     RecordValidator: {
