@@ -1,7 +1,8 @@
+import type { IndexedCallback } from "./iterable-utility";
 import { i18nextUtility } from "./locale/i18n.js";
 import { RegExpValidator } from "./reg-exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
-import { Transformer, type TransformerCallback, type TransformerInput, type TransformerOutput } from "./transformer.js";
+import { Transformer, type TransformerInput, type TransformerOutput } from "./transformer.js";
 
 /**
  * Exclusion options for validating and creating strings based on character sets.
@@ -550,7 +551,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * String(s) created from the value(s).
      */
-    create<TTransformerInput extends TransformerInput<number | bigint>>(length: number, valueOrValues: TTransformerInput, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creatorCallback?: TransformerCallback<string, string>): TransformerOutput<TTransformerInput, string> {
+    create<TTransformerInput extends TransformerInput<number | bigint>>(length: number, valueOrValues: TTransformerInput, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): TransformerOutput<TTransformerInput, string> {
         this.validateLength(length);
         this.validateExclusion(exclusion);
 

@@ -16,6 +16,7 @@
  */
 export * from "./locale/i18n.js";
 export * from "./sequence.js";
+export * from "./iterable-utility.js";
 export * from "./transformer.js";
 export type * from "./string.js";
 export * from "./reg-exp.js";
