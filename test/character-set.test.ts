@@ -1,20 +1,28 @@
 import { I18NEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
 import {
-    ALPHABETIC_CREATOR,
-    ALPHANUMERIC_CREATOR,
-    CharacterSetCreator,
+    ALPHABETIC_CREATOR, ALPHABETIC_VALIDATOR,
+    ALPHANUMERIC_CREATOR, ALPHANUMERIC_VALIDATOR,
+    CharacterSetCreator, type CharacterSetValidator,
     Exclusion,
-    HEXADECIMAL_CREATOR,
+    HEXADECIMAL_CREATOR, HEXADECIMAL_VALIDATOR,
     i18nUtilityInit,
-    NUMERIC_CREATOR,
+    NUMERIC_CREATOR, NUMERIC_VALIDATOR,
     Sequence
 } from "../src";
 
 await i18nUtilityInit(I18NEnvironment.CLI);
 
-function testCharacterSetCreator(name: string, characterSetCreator: CharacterSetCreator, characterSetSize: number, length: number, excludeFirstZero: boolean, excludeAllNumeric: boolean): void {
+// Type is used to ensure that testCharacterSet() is not called with creator twice.
+type ValidatorNotCreator<T extends CharacterSetValidator> =
+    T extends CharacterSetCreator ? never : T;
+
+function testCharacterSet<T extends CharacterSetValidator>(name: string, characterSetCreator: CharacterSetCreator, characterSetValidator: ValidatorNotCreator<T>, characterSetSize: number, length: number, excludeFirstZero: boolean, excludeAllNumeric: boolean): void {
     describe(name, () => {
+        test("Validator is creator", () => {
+            expect(characterSetValidator).toBe(characterSetCreator);
+        });
+
         test("Character set", () => {
             characterSetCreator.characterSet.forEach((c, index) => {
                 expect(c).not.toBeUndefined();
@@ -77,6 +85,9 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
 
                 expect(s.length).toBe(length);
 
+                expect(() => {
+                    characterSetValidator.validate(s);
+                }).not.toThrow(RangeError);
                 expect(characterSetCreator.valueFor(s, exclusion)).toBe(BigInt(index));
 
                 index++;
@@ -104,6 +115,9 @@ function testCharacterSetCreator(name: string, characterSetCreator: CharacterSet
                 expect(sequenceSet.has(s)).toBe(false);
                 sequenceSet.add(s);
 
+                expect(() => {
+                    characterSetValidator.validate(s);
+                }).not.toThrow(RangeError);
                 expect(characterSetCreator.valueFor(s, exclusion, 123456n)).toBe(BigInt(domain - index - 1));
 
                 index++;
@@ -198,12 +212,15 @@ describe("Exclusion", () => {
     });
 });
 
-testCharacterSetCreator("Numeric", NUMERIC_CREATOR, 10, 4, true, false);
-testCharacterSetCreator("Hexadecimal", HEXADECIMAL_CREATOR, 16, 4, true, true);
-testCharacterSetCreator("Alphabetic", ALPHABETIC_CREATOR, 26, 3, false, false);
-testCharacterSetCreator("Alphanumeric", ALPHANUMERIC_CREATOR, 36, 3, true, true);
-testCharacterSetCreator("Middle numeric", new CharacterSetCreator([
+testCharacterSet("Numeric", NUMERIC_CREATOR, NUMERIC_VALIDATOR, 10, 4, true, false);
+testCharacterSet("Hexadecimal", HEXADECIMAL_CREATOR, HEXADECIMAL_VALIDATOR, 16, 4, true, true);
+testCharacterSet("Alphabetic", ALPHABETIC_CREATOR, ALPHABETIC_VALIDATOR, 26, 3, false, false);
+testCharacterSet("Alphanumeric", ALPHANUMERIC_CREATOR, ALPHANUMERIC_VALIDATOR, 36, 3, true, true);
+
+const middleNumericCreator = new CharacterSetCreator([
     "(", ")",
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "<", ">"
-], Exclusion.AllNumeric), 14, 4, false, true);
+], Exclusion.AllNumeric);
+
+testCharacterSet("Middle numeric", middleNumericCreator, middleNumericCreator as CharacterSetValidator, 14, 4, false, true);

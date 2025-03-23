@@ -663,6 +663,11 @@ export const NUMERIC_CREATOR = new CharacterSetCreator([
 ], Exclusion.FirstZero);
 
 /**
+ * Numeric validator. Character set is 0-9. Supports {@link Exclusion.FirstZero}.
+ */
+export const NUMERIC_VALIDATOR = NUMERIC_CREATOR as CharacterSetValidator;
+
+/**
  * Hexadecimal creator. Character set is 0-9, A-F. Supports {@link Exclusion.FirstZero} and {@link
  * Exclusion.AllNumeric}.
  */
@@ -670,6 +675,12 @@ export const HEXADECIMAL_CREATOR = new CharacterSetCreator([
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "A", "B", "C", "D", "E", "F"
 ], Exclusion.FirstZero, Exclusion.AllNumeric);
+
+/**
+ * Hexadecimal validator. Character set is 0-9, A-F. Supports {@link Exclusion.FirstZero} and {@link
+ * Exclusion.AllNumeric}.
+ */
+export const HEXADECIMAL_VALIDATOR = HEXADECIMAL_CREATOR as CharacterSetValidator;
 
 /**
  * Alphabetic creator. Character set is A-Z.
@@ -680,6 +691,11 @@ export const ALPHABETIC_CREATOR = new CharacterSetCreator([
 ]);
 
 /**
+ * Alphabetic validator. Character set is A-Z.
+ */
+export const ALPHABETIC_VALIDATOR = ALPHABETIC_CREATOR as CharacterSetValidator;
+
+/**
  * Alphanumeric creator. Character set is 0-9, A-Z. Supports {@link Exclusion.FirstZero} and {@link
  * Exclusion.AllNumeric}.
  */
@@ -688,3 +704,9 @@ export const ALPHANUMERIC_CREATOR = new CharacterSetCreator([
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
     "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
 ], Exclusion.FirstZero, Exclusion.AllNumeric);
+
+/**
+ * Alphanumeric validator. Character set is 0-9, A-Z. Supports {@link Exclusion.FirstZero} and {@link
+ * Exclusion.AllNumeric}.
+ */
+export const ALPHANUMERIC_VALIDATOR = ALPHANUMERIC_CREATOR as CharacterSetValidator;
