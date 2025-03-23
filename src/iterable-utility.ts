@@ -1,6 +1,12 @@
 /**
  * Indexed callback, used to map an input and optionally its index in an iterable to an output.
  *
+ * @template TInput
+ * Input type.
+ *
+ * @template TOutput
+ * Output type.
+ *
  * @param input
  * Input value.
  *
@@ -14,6 +20,12 @@ export type IndexedCallback<TInput, TOutput> = (input: TInput, index?: number) =
 
 /**
  * Map an input iterable to an output iterable that applies a transformer callback to each value in the input.
+ *
+ * @template TInput
+ * Input type.
+ *
+ * @template TOutput
+ * Output type.
  *
  * @param values
  * Input values iterable.

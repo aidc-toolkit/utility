@@ -11,7 +11,7 @@ export type TransformerPrimitive = string | number | bigint | boolean;
  * Transformer input type, one of:
  *
  * - TInput (primitive type)
- * - Iterable<TInput>
+ * - Iterable\<TInput\>
  *
  * @template TInput
  * Transformer input primitive type.
@@ -22,7 +22,7 @@ export type TransformerInput<TInput extends TransformerPrimitive> = TInput | Ite
  * Transformer output, based on transformer input:
  *
  * - If type TTransformerInput is primitive, result is type TOutput.
- * - If type TTransformerInput is Iterable, result is type Iterable<TOutput>.
+ * - If type TTransformerInput is Iterable, result is type Iterable\<TOutput\>.
  *
  * @template TTransformerInput
  * Transformer input type.

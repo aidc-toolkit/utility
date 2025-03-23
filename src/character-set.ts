@@ -532,6 +532,9 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * Create string(s) by mapping value(s) to the equivalent characters in the character set across the length of the
      * string.
      *
+     * @template TTransformerInput
+     * Transformer input type.
+     *
      * @param length
      * Required string length.
      *

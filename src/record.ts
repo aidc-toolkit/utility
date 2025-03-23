@@ -4,6 +4,9 @@ import type { StringValidator } from "./string.js";
 /**
  * Record validator. Validation is performed against a record with a string key type and throws an error if the key is
  * not found.
+ *
+ * @template T
+ * Property type.
  */
 export class RecordValidator<T> implements StringValidator {
     /**

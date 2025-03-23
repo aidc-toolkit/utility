@@ -7,6 +7,9 @@ export interface StringValidation {
 
 /**
  * String validator interface.
+ *
+ * @template V
+ * String validation type.
  */
 export interface StringValidator<V extends StringValidation = StringValidation> {
     /**
