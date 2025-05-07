@@ -14,8 +14,7 @@ import {
 await i18nUtilityInit(I18NEnvironment.CLI);
 
 // Type is used to ensure that testCharacterSet() is not called with creator twice.
-type ValidatorNotCreator<T extends CharacterSetValidator> =
-    T extends CharacterSetCreator ? never : T;
+type ValidatorNotCreator<T extends CharacterSetValidator> = T extends CharacterSetCreator ? never : T;
 
 function testCharacterSet<T extends CharacterSetValidator>(name: string, characterSetCreator: CharacterSetCreator, characterSetValidator: ValidatorNotCreator<T>, characterSetSize: number, length: number, excludeFirstZero: boolean, excludeAllNumeric: boolean): void {
     describe(name, () => {

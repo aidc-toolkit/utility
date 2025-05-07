@@ -30,8 +30,7 @@ export type TransformerInput<TInput extends TransformerPrimitive> = TInput | Ite
  * @template TOutput
  * Output base type.
  */
-export type TransformerOutput<TTransformerInput extends TransformerInput<TransformerPrimitive>, TOutput> =
-    TTransformerInput extends (TTransformerInput extends TransformerInput<infer TInput> ? TInput : never) ? TOutput : Iterable<TOutput>;
+export type TransformerOutput<TTransformerInput extends TransformerInput<TransformerPrimitive>, TOutput> = TTransformerInput extends (TTransformerInput extends TransformerInput<infer TInput> ? TInput : never) ? TOutput : Iterable<TOutput>;
 
 /**
  * Transformer that transforms values in a numeric domain to values in a range equal to the domain or to another range
