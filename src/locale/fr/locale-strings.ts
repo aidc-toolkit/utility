@@ -23,7 +23,7 @@ export const localeStrings = {
         invalidCharacterAtPosition: "Caractère non valide '{{c}}' à la position {{position, number}}",
         invalidCharacterAtPositionOfComponent: "Caractère non valide '{{c}}' à la position {{position, number}} de {{component}}",
         exclusionNotSupported: "La valeur d'exclusion de {{exclusion, number}} n'est pas prise en charge",
-        endSequenceValueMustBeLessThanOrEqualTo: "La valeur de la séquence de fin (valeur de la séquence de début + nombre - 1) doit être inférieure à {{domaine}}"
+        endSequenceValueMustBeLessThanOrEqualTo: "La valeur de la séquence de fin (valeur de la séquence de début + nombre - 1) doit être inférieure à {{domain, number}}"
     },
     RecordValidator: {
         typeNameKeyNotFound: "{{typeName}} \"{{key}}\" introuvable"
