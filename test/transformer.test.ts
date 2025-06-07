@@ -59,7 +59,7 @@ describe("Identity", () => {
         expect(transformer instanceof IdentityTransformer).toBe(true);
         expect(Transformer.get(1000n)).toBe(transformer);
 
-        expect(transformer.domain).toBe(BigInt(1000n));
+        expect(transformer.domain).toBe(1000n);
     });
 
     test("Reversible", () => {
@@ -84,7 +84,7 @@ describe("Encryption", () => {
         expect(transformer instanceof EncryptionTransformer).toBe(true);
         expect(Transformer.get(1000n, 1234n)).toBe(transformer);
 
-        expect(transformer.domain).toBe(BigInt(1000n));
+        expect(transformer.domain).toBe(1000n);
 
         const transformer0 = Transformer.get(1000, 0);
 
