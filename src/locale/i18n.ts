@@ -1,4 +1,4 @@
-import { i18nAssertValidResources, i18nCoreInit, type I18NEnvironment } from "@aidc-toolkit/core";
+import { i18nAssertValidResources, i18nCoreInit, type I18nEnvironment } from "@aidc-toolkit/core";
 import i18next, { type i18n, type Resource } from "i18next";
 import { localeStrings as enLocaleStrings } from "./en/locale-strings.js";
 import { localeStrings as frLocaleStrings } from "./fr/locale-strings.js";
@@ -39,6 +39,6 @@ export const i18nextUtility: i18n = i18next.createInstance();
  * @returns
  * Void promise.
  */
-export async function i18nUtilityInit(environment: I18NEnvironment, debug = false): Promise<void> {
+export async function i18nUtilityInit(environment: I18nEnvironment, debug = false): Promise<void> {
     await i18nCoreInit(i18nextUtility, environment, debug, utilityNS, utilityResources);
 }

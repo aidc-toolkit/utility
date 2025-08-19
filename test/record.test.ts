@@ -1,8 +1,8 @@
-import { I18NEnvironment } from "@aidc-toolkit/core";
+import { I18nEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
 import { i18nUtilityInit, RecordValidator } from "../src";
 
-await i18nUtilityInit(I18NEnvironment.CLI);
+await i18nUtilityInit(I18nEnvironment.CLI);
 
 describe("Record validator", () => {
     enum StringEnum {
