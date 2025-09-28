@@ -1,4 +1,4 @@
-import type { IndexedCallback } from "./iterable-utility";
+import type { IndexedCallback } from "./iterable-utility.js";
 import { i18nextUtility } from "./locale/i18n.js";
 import { RegExpValidator } from "./reg-exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
