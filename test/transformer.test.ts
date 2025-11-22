@@ -1,5 +1,5 @@
 import { I18nEnvironment } from "@aidc-toolkit/core";
-import { afterEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { EncryptionTransformer, i18nUtilityInit, IdentityTransformer, Sequence, Transformer } from "../src";
 
 await i18nUtilityInit(I18nEnvironment.CLI);
@@ -51,12 +51,6 @@ function testTransformer(domain: number, tweak?: number, callback?: (value: bigi
     expect(() => transformer.forward(new Sequence(0, -1))).not.toThrow(RangeError);
     expect(() => transformer.forward(new Sequence(-1, -1))).toThrow("Minimum value -1 must be greater than or equal to 0");
 }
-
-// TODO Remove when https://github.com/vitest-dev/vitest/discussions/6511 resolved.
-afterEach(async () => {
-    // eslint-disable-next-line promise/avoid-new -- Patch.
-    await new Promise(resolve => setImmediate(resolve));
-});
 
 describe("Identity", () => {
     test("Get", () => {
