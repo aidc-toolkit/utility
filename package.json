@@ -31,7 +31,6 @@
     "vitest": "^4.0.13"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "alpha",
-    "i18next": "^25.6.3"
+    "@aidc-toolkit/core": "alpha"
   }
 }
