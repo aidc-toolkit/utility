@@ -21,4 +21,5 @@ export * from "./transformer.js";
 export type * from "./string.js";
 export * from "./reg-exp.js";
 export * from "./record.js";
+export * from "./exclusion.js";
 export * from "./character-set.js";
