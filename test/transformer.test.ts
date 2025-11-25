@@ -1,8 +1,5 @@
-import { I18nEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { EncryptionTransformer, i18nUtilityInit, IdentityTransformer, Sequence, Transformer } from "../src";
-
-await i18nUtilityInit(I18nEnvironment.CLI);
+import { EncryptionTransformer, IdentityTransformer, Sequence, Transformer } from "../src";
 
 function testTransformer(domain: number, tweak?: number, callback?: (value: bigint, forwardValue: bigint) => void): void {
     const transformer = Transformer.get(domain, tweak);

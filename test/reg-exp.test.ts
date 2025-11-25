@@ -1,8 +1,5 @@
-import { I18nEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { i18nUtilityInit, RegExpValidator } from "../src";
-
-await i18nUtilityInit(I18nEnvironment.CLI);
+import { RegExpValidator } from "../src";
 
 describe("Regular expression validator", () => {
     test("Validation", () => {

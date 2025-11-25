@@ -1,4 +1,3 @@
-import { I18nEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
 import {
     ALPHABETIC_CREATOR,
@@ -11,13 +10,10 @@ import {
     Exclusions,
     HEXADECIMAL_CREATOR,
     HEXADECIMAL_VALIDATOR,
-    i18nUtilityInit,
     NUMERIC_CREATOR,
     NUMERIC_VALIDATOR,
     Sequence
 } from "../src";
-
-await i18nUtilityInit(I18nEnvironment.CLI);
 
 // Type is used to ensure that testCharacterSet() is not called with creator twice.
 type ValidatorNotCreator<T extends CharacterSetValidator> = T extends CharacterSetCreator ? never : T;
