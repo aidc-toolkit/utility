@@ -1,26 +1,26 @@
 import { i18nAssertValidResources, i18nCoreInit, type I18nEnvironment } from "@aidc-toolkit/core";
 import i18next, { type i18n, type Resource } from "i18next";
-import { localeStrings as enLocaleStrings } from "./en/locale-strings.js";
-import { localeStrings as frLocaleStrings } from "./fr/locale-strings.js";
+import enLocaleResources from "./en/locale-resources.js";
+import frLocaleResources from "./fr/locale-resources.js";
 
 export const utilityNS = "aidct_utility";
 
 /**
  * Locale strings type is extracted from the English locale strings object.
  */
-export type UtilityLocaleStrings = typeof enLocaleStrings;
+export type UtilityLocaleResources = typeof enLocaleResources;
 
-i18nAssertValidResources(enLocaleStrings, "fr", frLocaleStrings);
+i18nAssertValidResources(enLocaleResources, "fr", frLocaleResources);
 
 /**
  * Utility resources.
  */
 export const utilityResources: Resource = {
     en: {
-        aidct_utility: enLocaleStrings
+        aidct_utility: enLocaleResources
     },
     fr: {
-        aidct_utility: frLocaleStrings
+        aidct_utility: frLocaleResources
     }
 };
 

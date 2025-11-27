@@ -1,4 +1,4 @@
-export const localeStrings = {
+export default {
     Transformer: {
         domainMustBeGreaterThanZero: "Domain {{domain, number}} must be greater than 0",
         tweakMustBeGreaterThanOrEqualToZero: "Tweak {{tweak, number}} must be greater than or equal to 0",
