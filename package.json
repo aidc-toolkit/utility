@@ -1,6 +1,6 @@
 {
   "name": "@aidc-toolkit/utility",
-  "version": "0.9.21-beta",
+  "version": "1.0.21-beta",
   "description": "Foundational utilities for AIDC Toolkit",
   "type": "module",
   "main": "dist/index.js",
