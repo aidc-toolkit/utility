@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@aidc-toolkit/dev": "alpha",
-    "vitest": "^4.0.13"
+    "vitest": "^4.0.14"
   },
   "dependencies": {
     "@aidc-toolkit/core": "alpha"
