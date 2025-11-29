@@ -1,4 +1,4 @@
-import type { UtilityLocaleResources } from "./i18n.js";
+import type { UtilityLocaleResources } from "./i18n";
 
 /**
  * Internationalization module.

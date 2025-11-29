@@ -1,6 +1,6 @@
-import { type IndexedCallback, mapIterable } from "./iterable-utility.js";
-import { i18nextUtility } from "./locale/i18n.js";
-import { Sequence } from "./sequence.js";
+import { type IndexedCallback, mapIterable } from "./iterable-utility";
+import { i18nextUtility } from "./locale/i18n";
+import { Sequence } from "./sequence";
 
 /**
  * Transformer primitive type.

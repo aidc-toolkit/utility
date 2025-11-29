@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./locale/i18n.js";
-export * from "./sequence.js";
-export * from "./iterable-utility.js";
-export * from "./transformer.js";
-export type * from "./string.js";
-export * from "./reg-exp.js";
-export * from "./record.js";
-export * from "./exclusion.js";
-export * from "./character-set.js";
+export * from "./locale/i18n";
+export * from "./sequence";
+export * from "./iterable-utility";
+export * from "./transformer";
+export type * from "./string";
+export * from "./reg-exp";
+export * from "./record";
+export * from "./exclusion";
+export * from "./character-set";

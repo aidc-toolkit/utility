@@ -1,9 +1,9 @@
-import { type Exclusion, Exclusions } from "./exclusion.js";
-import type { IndexedCallback } from "./iterable-utility.js";
-import { i18nextUtility } from "./locale/i18n.js";
-import { RegExpValidator } from "./reg-exp.js";
-import type { StringValidation, StringValidator } from "./string.js";
-import { Transformer, type TransformerInput, type TransformerOutput } from "./transformer.js";
+import { type Exclusion, Exclusions } from "./exclusion";
+import type { IndexedCallback } from "./iterable-utility";
+import { i18nextUtility } from "./locale/i18n";
+import { RegExpValidator } from "./reg-exp";
+import type { StringValidation, StringValidator } from "./string";
+import { Transformer, type TransformerInput, type TransformerOutput } from "./transformer";
 
 /**
  * Character set validation parameters.
