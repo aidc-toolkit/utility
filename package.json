@@ -17,9 +17,8 @@
   },
   "scripts": {
     "lint": "eslint",
-    "build:core": "rimraf dist && tsc --project",
-    "build:dev": "npm run build:core -- node_modules/@aidc-toolkit/dev/tsconfig-build-dev.json",
-    "build:release": "npm run build:core -- node_modules/@aidc-toolkit/dev/tsconfig-build.json",
+    "build:dev": "tsup --define.mode=dev",
+    "build:release": "tsup",
     "build:doc": "npm run build:dev",
     "test": "vitest run"
   },
