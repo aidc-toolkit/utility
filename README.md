@@ -54,7 +54,7 @@ Each statement has a quantity and an output. Implicit in them is the requirement
         ```
     * Pass it to a function.
         ```typescript
-        // Crate a sequence of 10-character hexadecimal strings.
+        // Create a sequence of 10-character hexadecimal strings.
         const stringSequence = HEXADECIMAL_STRING_CREATOR.create(10, sequence);
         ```
 
