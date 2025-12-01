@@ -24,9 +24,9 @@ To provide the most flexibility and to handle the most significant demands of th
 
 Many of AIDC processes can be reduced to a simple statement about sequences:
 
-* "Give me a million serial numbers for manufacturing."
-* "Generate a handful of GTINs for my new product line."
-* "Label the containers in the shipping area with SSCCs."
+- "Give me a million serial numbers for manufacturing."
+- "Generate a handful of GTINs for my new product line."
+- "Label the containers in the shipping area with SSCCs."
 
 Each statement has a quantity and an output. Implicit in them is the requirement that the generated output be unique, not only within itself, but also within any previous outputs generated. A [`Sequence`](https://aidc-toolkit.com/api/Utility/classes/Sequence.html) is simply a utility to generate a sequence of integers given a start value and a count.
 
@@ -34,7 +34,7 @@ Each statement has a quantity and an output. Implicit in them is the requirement
 > 
 > The AIDC Toolkit is not responsible for maintaining the history of any sequence. It is up to the application to ensure that the start value and count don't overlap with any other start value and count for a sequence used for the same purpose.
 
-#### Creating and using a sequence
+#### Creating and Using a Sequence
 
 1. Create a sequence with a start value and a count. The count is typically positive, which means that the sequence runs from the start value up. If negative, the sequence runs from the start value down.
     ```typescript
@@ -122,7 +122,7 @@ flowchart TD
 
 ## Strings
 
-### String validation
+### String Validation
 
 Validation is a requirement for any application. The AIDC Toolkit provides a simple but extensible validation framework built on two interfaces: [`StringValidation`](https://aidc-toolkit.com/api/Utility/interfaces/StringValidation.html) and [`StringValidator`](https://aidc-toolkit.com/api/Utility/interfaces/StringValidator.html). The two are related in that an interface extending `StringValidation` may be passed as a parameter to the [`validate()`](https://aidc-toolkit.com/api/Utility/interfaces/StringValidator#validate.html) method of a class implementing `StringValidator` to restrict validation further than the default. For example, [`CharacterSetValidator`](https://aidc-toolkit.com/api/Utility/classes/CharacterSetValidator.html) accepts a [`CharacterSetValidation`](https://aidc-toolkit.com/api/Utility/interfaces/CharacterSetValidation.html) object that can constrain the length and limit the way numeric values are expressed (e.g., exclude zero as the first character or exclude strings that are all numeric).
 
@@ -130,41 +130,41 @@ The `StringValidation` interface is a placeholder only; it's empty, which, in a 
 
 If a string passed to a `validate()` method is valid, the method returns; if not, a [`RangeError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError) is thrown.
 
-#### Predefined validators
+#### Predefined Validators
 
 The following validator types are predefined:
 
-* [Regular expression](https://aidc-toolkit.com/api/Utility/classes/RegExpValidator.html)
-    * Validates a string against a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions).
-* [Record](https://aidc-toolkit.com/api/Utility/classes/RecordValidator.html)
-    * Validates a string by looking it up in a [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) object.
-* [Character set](https://aidc-toolkit.com/api/Utility/classes/CharacterSetValidator.html)
-    * Validates a string by ensuring that each character is within a defined character set, with additional validation parameters optionally constraining the length and limiting the way numeric values are expressed. Predefined character set validators are:
-        * [Numeric (0-9)](https://aidc-toolkit.com/api/Utility/variables/NUMERIC_VALIDATOR.html)
-        * [Hexadecimal (0-9, A-F)](https://aidc-toolkit.com/api/Utility/variables/HEXADECIMAL_VALIDATOR.html)
-        * [Alphabetic (A-Z)](https://aidc-toolkit.com/api/Utility/variables/ALPHABETIC_VALIDATOR.html)
-        * [Alphanumeric (0-9, A-Z)](https://aidc-toolkit.com/api/Utility/variables/ALPHANUMERIC_VALIDATOR.html)
+- [Regular expression](https://aidc-toolkit.com/api/Utility/classes/RegExpValidator.html)
+  - Validates a string against a [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions).
+- [Record](https://aidc-toolkit.com/api/Utility/classes/RecordValidator.html)
+  - Validates a string by looking it up in a [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type) object.
+- [Character set](https://aidc-toolkit.com/api/Utility/classes/CharacterSetValidator.html)
+  - Validates a string by ensuring that each character is within a defined character set, with additional validation parameters optionally constraining the length and limiting the way numeric values are expressed. Predefined character set validators are:
+    - [Numeric (0-9)](https://aidc-toolkit.com/api/Utility/variables/NUMERIC_VALIDATOR.html)
+    - [Hexadecimal (0-9, A-F)](https://aidc-toolkit.com/api/Utility/variables/HEXADECIMAL_VALIDATOR.html)
+    - [Alphabetic (A-Z)](https://aidc-toolkit.com/api/Utility/variables/ALPHABETIC_VALIDATOR.html)
+    - [Alphanumeric (0-9, A-Z)](https://aidc-toolkit.com/api/Utility/variables/ALPHANUMERIC_VALIDATOR.html)
 
-### String creation
+### String Creation
 
 String creation varies depending on the type of string being created, so there's no single interface that can be implemented. There is a pattern, however:
 
-* Creation is done via a `create()` method. If the class can create more than one type of string, it can define additional `create*NNN*()` methods as appropriate.
-* The `create()` (or `create*NNN*()`) method is overloaded, with a parameter accepting either a single value to create a single string or multiple values (as `Iterable`) to create multiple strings.
-* If the value to create a string is numeric (`number` or `bigint`), the method uses a [`Transformer`](https://aidc-toolkit.com/api/Utility/classes/Transformer.html) and supports sparse creation.
-    * Because of this, passing in a [`Sequence`](https://aidc-toolkit.com/api/Utility/classes/Sequence.html) is strongly recommended when creating multiple strings.
+- Creation is done via a `create()` method. If the class can create more than one type of string, it can define additional `create*NNN*()` methods as appropriate.
+- The `create()` (or `create*NNN*()`) method is overloaded, with a parameter accepting either a single value to create a single string or multiple values (as `Iterable`) to create multiple strings.
+- If the value to create a string is numeric (`number` or `bigint`), the method uses a [`Transformer`](https://aidc-toolkit.com/api/Utility/classes/Transformer.html) and supports sparse creation.
+  - Because of this, passing in a [`Sequence`](https://aidc-toolkit.com/api/Utility/classes/Sequence.html) is strongly recommended when creating multiple strings.
 
-#### Predefined creators
+#### Predefined Creators
 
 The following creator types are predefined:
 
-* [Character set](https://aidc-toolkit.com/api/Utility/classes/CharacterSetCreator.html)
-    * Creates strings by mapping numeric (`number` and `bigint`) values to fixed-length string representations using the character set as the "digits" of the string. Predefined character set creators are:
-        * [Numeric (0-9)](https://aidc-toolkit.com/api/Utility/variables/NUMERIC_CREATOR.html)
-        * [Hexadecimal (0-9, A-F)](https://aidc-toolkit.com/api/Utility/variables/HEXADECIMAL_CREATOR.html)
-        * [Alphabetic (A-Z)](https://aidc-toolkit.com/api/Utility/variables/ALPHABETIC_CREATOR.html)
-        * [Alphanumeric (0-9, A-Z)](https://aidc-toolkit.com/api/Utility/variables/ALPHANUMERIC_CREATOR.html)
+- [Character set](https://aidc-toolkit.com/api/Utility/classes/CharacterSetCreator.html)
+  - Creates strings by mapping numeric (`number` and `bigint`) values to fixed-length string representations using the character set as the "digits" of the string. Predefined character set creators are:
+    - [Numeric (0-9)](https://aidc-toolkit.com/api/Utility/variables/NUMERIC_CREATOR.html)
+    - [Hexadecimal (0-9, A-F)](https://aidc-toolkit.com/api/Utility/variables/HEXADECIMAL_CREATOR.html)
+    - [Alphabetic (A-Z)](https://aidc-toolkit.com/api/Utility/variables/ALPHABETIC_CREATOR.html)
+    - [Alphanumeric (0-9, A-Z)](https://aidc-toolkit.com/api/Utility/variables/ALPHANUMERIC_CREATOR.html)
 
-#### Output restriction
+#### Output Restriction
 
 As with string validators, string creators can restrict their output to meet the needs of certain use cases. For example, when creating serial numbers, it may be necessary to generate values that either don't start with a zero (to prevent leading zeros from being dropped by other applications) or that aren't composed entirely of digits (to prevent strings from being interpreted as numbers).
