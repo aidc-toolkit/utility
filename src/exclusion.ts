@@ -19,6 +19,11 @@ export const Exclusions = {
 } as const;
 
 /**
+ * Exclusion key.
+ */
+export type ExclusionKey = keyof typeof Exclusions;
+
+/**
  * Exclusion.
  */
-export type Exclusion = typeof Exclusions[keyof typeof Exclusions];
+export type Exclusion = typeof Exclusions[ExclusionKey];

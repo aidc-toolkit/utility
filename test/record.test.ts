@@ -9,7 +9,9 @@ describe("Record validator", () => {
         ValueD: "D"
     } as const;
 
-    type StringIndex = typeof StringIndexes[keyof typeof StringIndexes];
+    type StringIndexKey = keyof typeof StringIndexes;
+
+    type StringIndex = typeof StringIndexes[StringIndexKey];
 
     const stringRecord: Record<StringIndex, string> = {
         [StringIndexes.ValueA]: "This is for Value A",
