@@ -8,10 +8,10 @@ export interface StringValidation {
 /**
  * String validator interface.
  *
- * @template V
+ * @template TStringValidation
  * String validation type.
  */
-export interface StringValidator<V extends StringValidation = StringValidation> {
+export interface StringValidator<TStringValidation extends StringValidation = StringValidation> {
     /**
      * Validate a string and throw an error if validation fails.
      *
@@ -21,5 +21,5 @@ export interface StringValidator<V extends StringValidation = StringValidation> 
      * @param validation
      * String validation parameters.
      */
-    validate: (s: string, validation?: V) => void;
+    validate: (s: string, validation?: TStringValidation) => void;
 }
