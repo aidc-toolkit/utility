@@ -81,7 +81,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * set.
      *
      * @param exclusionSupport
-     * Exclusions supported by the character set. All character sets implicitly support {@link Exclusions.None}.
+     * Exclusions supported by the character set. All character sets implicitly support {@linkcode Exclusions.None}.
      */
     constructor(characterSet: readonly string[], ...exclusionSupport: readonly Exclusion[]) {
         this._characterSet = characterSet;
@@ -324,7 +324,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
     private readonly _characterSetSizeMinusOneN: bigint;
 
     /**
-     * Domains for every length for every supported {@link Exclusions}.
+     * Domains for every length for every supported {@linkcode Exclusions}.
      */
     private readonly _exclusionDomains: ReadonlyArray<readonly bigint[]>;
 
@@ -341,7 +341,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * set.
      *
      * @param exclusionSupport
-     * Exclusions supported by the character set. All character sets implicitly support {@link Exclusions.None}.
+     * Exclusions supported by the character set. All character sets implicitly support {@linkcode Exclusions.None}.
      */
     constructor(characterSet: readonly string[], ...exclusionSupport: readonly Exclusion[]) {
         super(characterSet, ...exclusionSupport);
@@ -488,7 +488,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
     }
 
     /**
-     * Validate that a length is less than or equal to {@link MAXIMUM_STRING_LENGTH}. If not, an error is thrown.
+     * Validate that a length is less than or equal to {@linkcode MAXIMUM_STRING_LENGTH}. If not, an error is thrown.
      *
      * @param length
      * Length.
@@ -523,7 +523,8 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * Numeric value(s) of the string(s).
      *
      * @param exclusion
-     * String(s) to be excluded from the range of outputs. See {@link Exclusions} for possible values and their meaning.
+     * String(s) to be excluded from the range of outputs. See {@linkcode Exclusions} for possible values and their
+     * meaning.
      *
      * @param tweak
      * If provided, the numerical value of the string(s) is/are "tweaked" using an {@link EncryptionTransformer |
@@ -581,7 +582,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * String.
      *
      * @param exclusion
-     * Strings excluded from the range of inputs. See {@link Exclusions} for possible values and their meaning.
+     * Strings excluded from the range of inputs. See {@linkcode Exclusions} for possible values and their meaning.
      *
      * @param tweak
      * If provided, the numerical value of the string was "tweaked" using an {@link EncryptionTransformer | encryption
@@ -640,19 +641,19 @@ export class CharacterSetCreator extends CharacterSetValidator {
 }
 
 /**
- * Numeric creator. Character set is 0-9. Supports {@link Exclusions.FirstZero}.
+ * Numeric creator. Character set is 0-9. Supports {@linkcode Exclusions.FirstZero}.
  */
 export const NUMERIC_CREATOR = new CharacterSetCreator([
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
 ], Exclusions.FirstZero);
 
 /**
- * Numeric validator. Character set is 0-9. Supports {@link Exclusions.FirstZero}.
+ * Numeric validator. Character set is 0-9. Supports {@linkcode Exclusions.FirstZero}.
  */
 export const NUMERIC_VALIDATOR = NUMERIC_CREATOR as CharacterSetValidator;
 
 /**
- * Hexadecimal creator. Character set is 0-9, A-F. Supports {@link Exclusions.FirstZero} and {@link
+ * Hexadecimal creator. Character set is 0-9, A-F. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
  * Exclusions.AllNumeric}.
  */
 export const HEXADECIMAL_CREATOR = new CharacterSetCreator([
@@ -661,7 +662,7 @@ export const HEXADECIMAL_CREATOR = new CharacterSetCreator([
 ], Exclusions.FirstZero, Exclusions.AllNumeric);
 
 /**
- * Hexadecimal validator. Character set is 0-9, A-F. Supports {@link Exclusions.FirstZero} and {@link
+ * Hexadecimal validator. Character set is 0-9, A-F. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
  * Exclusions.AllNumeric}.
  */
 export const HEXADECIMAL_VALIDATOR = HEXADECIMAL_CREATOR as CharacterSetValidator;
@@ -680,7 +681,7 @@ export const ALPHABETIC_CREATOR = new CharacterSetCreator([
 export const ALPHABETIC_VALIDATOR = ALPHABETIC_CREATOR as CharacterSetValidator;
 
 /**
- * Alphanumeric creator. Character set is 0-9, A-Z. Supports {@link Exclusions.FirstZero} and {@link
+ * Alphanumeric creator. Character set is 0-9, A-Z. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
  * Exclusions.AllNumeric}.
  */
 export const ALPHANUMERIC_CREATOR = new CharacterSetCreator([
@@ -690,7 +691,7 @@ export const ALPHANUMERIC_CREATOR = new CharacterSetCreator([
 ], Exclusions.FirstZero, Exclusions.AllNumeric);
 
 /**
- * Alphanumeric validator. Character set is 0-9, A-Z. Supports {@link Exclusions.FirstZero} and {@link
+ * Alphanumeric validator. Character set is 0-9, A-Z. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
  * Exclusions.AllNumeric}.
  */
 export const ALPHANUMERIC_VALIDATOR = ALPHANUMERIC_CREATOR as CharacterSetValidator;

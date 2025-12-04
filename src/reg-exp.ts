@@ -3,12 +3,12 @@ import type { StringValidator } from "./string";
 
 /**
  * Regular expression validator. The regular expression applies to the full string only if constructed as such. For
- * example, <code>&#x2F;\d&#x2A;&#x2F;</code> (0 or more digits) matches every string, <code>&#x2F;\d+&#x2F;</code>
- * (1 or more digits) matches strings with at least one digit, <code>&#x2F;^\d&#x2A;$&#x2F;</code> matches strings that
- * are all digits or empty, and <code>&#x2F;^\d+$&#x2F;</code> matches strings that are all digits and not empty.
+ * example, <code>&#x2F;\d&#x2A;&#x2F;</code> (0 or more digits) matches every string, <code>&#x2F;\d+&#x2F;</code> (1
+ * or more digits) matches strings with at least one digit, <code>&#x2F;^\d&#x2A;$&#x2F;</code> matches strings that are
+ * all digits or empty, and <code>&#x2F;^\d+$&#x2F;</code> matches strings that are all digits and not empty.
  *
- * Clients of this class are recommended to override the {@link createErrorMessage} method create a more suitable error
- * message for their use case.
+ * Clients of this class are recommended to override the {@linkcode createErrorMessage | createErrorMessage()} method
+ * to create a more suitable error message for their use case.
  */
 export class RegExpValidator implements StringValidator {
     /**

@@ -43,11 +43,12 @@ export type TransformerOutput<TTransformerInput extends TransformerInput<Transfo
  * into values in the same domain, typically for storage in a database where the data type and length are already fixed
  * and exfiltration of the data can have significant repercussions.
  *
- * Two subclasses are supported directly by this class: {@link IdentityTransformer} (which operates based on a domain
- * only) and {@link EncryptionTransformer} (which operates based on a domain and a tweak). If an application is expected
- * to make repeated use of a transformer with the same domain and (optional) tweak and can't manage the transformer
- * object, an in-memory cache is available via the {@link get} method. Properties in {@link IdentityTransformer} and
- * {@link EncryptionTransformer} are read-only once constructed, so there is no issue with their shared use.
+ * Two subclasses are supported directly by this class: {@linkcode IdentityTransformer} (which operates based on a
+ * domain only) and {@linkcode EncryptionTransformer} (which operates based on a domain and a tweak). If an application
+ * is expected to make repeated use of a transformer with the same domain and (optional) tweak and can't manage the
+ * transformer object, an in-memory cache is available via the {@linkcode get | get()} method. Properties in {@linkcode
+ * IdentityTransformer} and {@linkcode EncryptionTransformer} are read-only once constructed, so there is no issue with
+ * their shared use.
  */
 export abstract class Transformer {
     /**
@@ -77,10 +78,10 @@ export abstract class Transformer {
     }
 
     /**
-     * Get a transformer, constructing it if necessary. The type returned is {@link IdentityTransformer} if tweak is
-     * undefined, {@link EncryptionTransformer} if tweak is defined. Note that although an {@link EncryptionTransformer}
-     * with a zero tweak operates as an {@link IdentityTransformer}, {@link EncryptionTransformer} is still the type
-     * returned if a zero tweak is explicitly specified.
+     * Get a transformer, constructing it if necessary. The type returned is {@linkcode IdentityTransformer} if tweak is
+     * undefined, {@linkcode EncryptionTransformer} if tweak is defined. Note that although an {@linkcode
+     * EncryptionTransformer} with a zero tweak operates as an {@linkcode IdentityTransformer}, {@linkcode
+     * EncryptionTransformer} is still the type returned if a zero tweak is explicitly specified.
      *
      * @param domain
      * Domain.
@@ -89,7 +90,7 @@ export abstract class Transformer {
      * Tweak.
      *
      * @returns
-     * {@link IdentityTransformer} if tweak is undefined, {@link EncryptionTransformer} if tweak is defined.
+     * {@linkcode IdentityTransformer} if tweak is undefined, {@linkcode EncryptionTransformer} if tweak is defined.
      */
     static get(domain: number | bigint, tweak?: number | bigint): Transformer {
         const domainN = BigInt(domain);
@@ -195,7 +196,7 @@ export abstract class Transformer {
      * Value(s) input type.
      *
      * @param valueOrValues
-     * Value(s). If this is an instance of {@link Sequence}, the minimum and maximum values are validated prior to
+     * Value(s). If this is an instance of {@linkcode Sequence}, the minimum and maximum values are validated prior to
      * transformation. Otherwise, the individual value(s) is/are validated at the time of transformation.
      *
      * @returns
@@ -213,7 +214,7 @@ export abstract class Transformer {
      * Transformation callback output type.
      *
      * @param valueOrValues
-     * Value(s). If this is an instance of {@link Sequence}, the minimum and maximum values are validated prior to
+     * Value(s). If this is an instance of {@linkcode Sequence}, the minimum and maximum values are validated prior to
      * transformation. Otherwise, the individual value(s) is/are validated at the time of transformation.
      *
      * @param transformerCallback
@@ -305,9 +306,9 @@ export class IdentityTransformer extends Transformer {
 /**
  * Encryption transformer. Values are transformed using repeated shuffle and xor operations, similar to those found in
  * many cryptography algorithms, particularly AES. While sufficient for obfuscation of numeric sequences (e.g., serial
- * number generation, below), if true format-preserving encryption is required, a more robust algorithm such as
- * {@link https://doi.org/10.6028/NIST.SP.800-38Gr1-draft | FF1} is recommended. Furthermore, no work has been done to
- * mitigate {@link https://timing.attacks.cr.yp.to/index.html | timing attacks} for key detection.
+ * number generation, below), if true format-preserving encryption is required, a more robust algorithm such as {@link
+ * https://doi.org/10.6028/NIST.SP.800-38Gr1.2pd | FF1} is recommended. Furthermore, no work has been done to mitigate
+ * {@link https://timing.attacks.cr.yp.to/index.html | timing attacks} for key detection.
  *
  * The purpose of the encryption transformer is to generate pseudo-random values in a deterministic manner to obscure
  * the sequence of values generated over time. A typical example is for serial number generation, where knowledge of the
