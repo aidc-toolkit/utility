@@ -554,7 +554,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
 
                 if (exclusion === Exclusions.AllNumeric && convertValue >= allZerosValue) {
                     // Value to convert is shifted by the number of all-numeric strings that occur at or prior to it.
-                    convertValue = convertValue + this.allNumericShift(true, length, convertValue - allZerosValue);
+                    convertValue += this.allNumericShift(true, length, convertValue - allZerosValue);
                 }
 
                 // Build string from right to left excluding the first character.
