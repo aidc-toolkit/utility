@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { EncryptionTransformer, IdentityTransformer, Sequence, Transformer } from "../src";
+import { EncryptionTransformer, IdentityTransformer, Sequence, Transformer } from "../src/index.js";
 
 function testTransformer(domain: number, tweak?: number, callback?: (value: bigint, forwardValue: bigint) => void): void {
     const transformer = Transformer.get(domain, tweak);

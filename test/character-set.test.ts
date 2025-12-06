@@ -13,7 +13,7 @@ import {
     NUMERIC_CREATOR,
     NUMERIC_VALIDATOR,
     Sequence
-} from "../src";
+} from "../src/index.js";
 
 // Type is used to ensure that testCharacterSet() is not called with creator twice.
 type ValidatorNotCreator<T extends CharacterSetValidator> = T extends CharacterSetCreator ? never : T;

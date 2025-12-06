@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { Sequence } from "../src";
+import { Sequence } from "../src/index.js";
 
 describe("Sequence", () => {
     const sequence1 = new Sequence(10, 20);

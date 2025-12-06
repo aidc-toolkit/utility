@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { RegExpValidator } from "../src";
+import { RegExpValidator } from "../src/index.js";
 
 describe("Regular expression validator", () => {
     test("Validation", () => {

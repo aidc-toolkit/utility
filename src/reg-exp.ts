@@ -1,5 +1,5 @@
-import { i18nextUtility } from "./locale/i18n";
-import type { StringValidator } from "./string";
+import { i18nextUtility } from "./locale/i18n.js";
+import type { StringValidator } from "./string.js";
 
 /**
  * Regular expression validator. The regular expression applies to the full string only if constructed as such. For

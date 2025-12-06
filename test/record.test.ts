@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { RecordValidator } from "../src";
+import { RecordValidator } from "../src/index.js";
 
 describe("Record validator", () => {
     const StringIndexes = {

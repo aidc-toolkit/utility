@@ -20,16 +20,17 @@
   },
   "scripts": {
     "lint": "eslint",
-    "build:dev": "tsup --define.mode=dev",
-    "build:release": "tsup",
+    "tsc:core": "tsc --project tsconfig-src.json",
+    "build:dev": "rimraf dist && npm run tsc:core -- --declarationMap --sourceMap",
+    "build:release": "npm run tsc:core -- --noEmit && tsup",
     "build:doc": "npm run build:dev",
     "test": "vitest run"
   },
   "devDependencies": {
-    "@aidc-toolkit/dev": "1.0.25-alpha.202512051624",
+    "@aidc-toolkit/dev": "1.0.25-alpha.202512061352",
     "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "1.0.25-alpha.202512051624"
+    "@aidc-toolkit/core": "1.0.25-alpha.202512061352"
   }
 }
