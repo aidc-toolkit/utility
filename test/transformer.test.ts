@@ -120,11 +120,6 @@ describe("Encryption", () => {
     });
 
     test("Byte boundary", () => {
-        expect((Transformer.get(256n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(1);
-        expect((Transformer.get(257n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(2);
-        expect((Transformer.get(65536n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(2);
-        expect((Transformer.get(65537n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(3);
-
         testTransformer(256, 1);
         testTransformer(257, 1);
     });

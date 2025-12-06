@@ -14,7 +14,7 @@ export class RegExpValidator implements StringValidator {
     /**
      * Regular expression.
      */
-    private readonly _regExp: RegExp;
+    readonly #regExp: RegExp;
 
     /**
      * Constructor.
@@ -23,14 +23,14 @@ export class RegExpValidator implements StringValidator {
      * Regular expression. See {@link RegExpValidator | class documentation} for notes.
      */
     constructor(regExp: RegExp) {
-        this._regExp = regExp;
+        this.#regExp = regExp;
     }
 
     /**
      * Get the regular expression.
      */
     get regExp(): RegExp {
-        return this._regExp;
+        return this.#regExp;
     }
 
     /**
@@ -53,7 +53,7 @@ export class RegExpValidator implements StringValidator {
      * @inheritDoc
      */
     validate(s: string): void {
-        if (!this._regExp.test(s)) {
+        if (!this.#regExp.test(s)) {
             throw new RangeError(this.createErrorMessage(s));
         }
     }

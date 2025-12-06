@@ -54,12 +54,12 @@ export abstract class Transformer {
     /**
      * Transformers cache, mapping a domain to another map, which maps an optional tweak to a transformer.
      */
-    private static readonly TRANSFORMER_MAPS_MAP = new Map<bigint, Map<bigint | undefined, Transformer>>();
+    static readonly #TRANSFORMER_MAPS_MAP = new Map<bigint, Map<bigint | undefined, Transformer>>();
 
     /**
      * Domain.
      */
-    private readonly _domain: bigint;
+    readonly #domain: bigint;
 
     /**
      * Constructor.
@@ -68,9 +68,9 @@ export abstract class Transformer {
      * Domain.
      */
     constructor(domain: number | bigint) {
-        this._domain = BigInt(domain);
+        this.#domain = BigInt(domain);
 
-        if (this._domain <= 0n) {
+        if (this.#domain <= 0n) {
             throw new RangeError(i18nextUtility.t("Transformer.domainMustBeGreaterThanZero", {
                 domain
             }));
@@ -95,11 +95,11 @@ export abstract class Transformer {
     static get(domain: number | bigint, tweak?: number | bigint): Transformer {
         const domainN = BigInt(domain);
 
-        let transformersMap = Transformer.TRANSFORMER_MAPS_MAP.get(domainN);
+        let transformersMap = Transformer.#TRANSFORMER_MAPS_MAP.get(domainN);
 
         if (transformersMap === undefined) {
             transformersMap = new Map();
-            Transformer.TRANSFORMER_MAPS_MAP.set(domainN, transformersMap);
+            Transformer.#TRANSFORMER_MAPS_MAP.set(domainN, transformersMap);
         }
 
         const tweakN = tweak === undefined ? undefined : BigInt(tweak);
@@ -118,7 +118,7 @@ export abstract class Transformer {
      * Get the domain.
      */
     get domain(): bigint {
-        return this._domain;
+        return this.#domain;
     }
 
     /**
@@ -127,7 +127,7 @@ export abstract class Transformer {
      * @param value
      * Value.
      */
-    private validate(value: bigint): void {
+    #validate(value: bigint): void {
         if (value < 0n) {
             throw new RangeError(i18nextUtility.t("Transformer.valueMustBeGreaterThanOrEqualToZero", {
                 value
@@ -162,10 +162,10 @@ export abstract class Transformer {
      * @returns
      * Transformed value.
      */
-    private validateDoForward(value: number | bigint): bigint {
+    #validateDoForward(value: number | bigint): bigint {
         const valueN = BigInt(value);
 
-        this.validate(valueN);
+        this.#validate(valueN);
 
         return this.doForward(valueN);
     }
@@ -185,8 +185,8 @@ export abstract class Transformer {
      * @returns
      * Transformed value.
      */
-    private validateDoForwardCallback<TOutput>(transformerCallback: IndexedCallback<bigint, TOutput>, value: number | bigint, index?: number): TOutput {
-        return transformerCallback(this.validateDoForward(value), index);
+    #validateDoForwardCallback<TOutput>(transformerCallback: IndexedCallback<bigint, TOutput>, value: number | bigint, index?: number): TOutput {
+        return transformerCallback(this.#validateDoForward(value), index);
     };
 
     /**
@@ -231,7 +231,7 @@ export abstract class Transformer {
         let result: bigint | TOutput | Iterable<bigint> | Iterable<TOutput>;
 
         if (typeof valueOrValues !== "object") {
-            result = transformerCallback === undefined ? this.validateDoForward(valueOrValues) : this.validateDoForwardCallback(transformerCallback, valueOrValues);
+            result = transformerCallback === undefined ? this.#validateDoForward(valueOrValues) : this.#validateDoForwardCallback(transformerCallback, valueOrValues);
         } else if (valueOrValues instanceof Sequence) {
             if (valueOrValues.minimumValue < 0n) {
                 throw new RangeError(i18nextUtility.t("Transformer.minimumValueMustBeGreaterThanOrEqualToZero", {
@@ -248,7 +248,7 @@ export abstract class Transformer {
 
             result = transformerCallback === undefined ? mapIterable(valueOrValues, value => this.doForward(value)) : mapIterable(valueOrValues, (value, index) => transformerCallback(this.doForward(value), index));
         } else {
-            result = transformerCallback === undefined ? mapIterable(valueOrValues, value => this.validateDoForward(value)) : mapIterable(valueOrValues, (value, index) => this.validateDoForwardCallback(transformerCallback, value, index));
+            result = transformerCallback === undefined ? mapIterable(valueOrValues, value => this.#validateDoForward(value)) : mapIterable(valueOrValues, (value, index) => this.#validateDoForwardCallback(transformerCallback, value, index));
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type determination is handled above.
@@ -278,7 +278,7 @@ export abstract class Transformer {
     reverse(transformedValue: number | bigint): bigint {
         const transformedValueN = BigInt(transformedValue);
 
-        this.validate(transformedValueN);
+        this.#validate(transformedValueN);
 
         return this.doReverse(transformedValueN);
     }
@@ -328,41 +328,41 @@ export class EncryptionTransformer extends Transformer {
     /**
      * Individual bits, pre-calculated for performance.
      */
-    private static readonly BITS = new Uint8Array([
+    static readonly #BITS = new Uint8Array([
         0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
     ]);
 
     /**
      * Inverse individual bits, pre-calculated for performance.
      */
-    private static readonly INVERSE_BITS = new Uint8Array([
+    static readonly #INVERSE_BITS = new Uint8Array([
         0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF, 0x7F
     ]);
 
     /**
      * Number of bytes covered by the domain.
      */
-    private readonly _domainBytes: number;
+    readonly #domainBytes: number;
 
     /**
      * Xor bytes array generated from the domain and tweak.
      */
-    private readonly _xorBytes: Uint8Array;
+    readonly #xorBytes: Uint8Array;
 
     /**
      * Bits array generated from the domain and tweak.
      */
-    private readonly _bits: Uint8Array;
+    readonly #bits: Uint8Array;
 
     /**
      * Inverse bits array generated from the domain and tweak.
      */
-    private readonly _inverseBits: Uint8Array;
+    readonly #inverseBits: Uint8Array;
 
     /**
      * Number of rounds (length of arrays) generated from the domain and tweak.
      */
-    private readonly _rounds: number;
+    readonly #rounds: number;
 
     /**
      * Constructor.
@@ -389,7 +389,7 @@ export class EncryptionTransformer extends Transformer {
             domainBytes++;
         }
 
-        this._domainBytes = domainBytes;
+        this.#domainBytes = domainBytes;
 
         const xorBytes = new Array<number>();
         const bits = new Array<number>();
@@ -404,29 +404,29 @@ export class EncryptionTransformer extends Transformer {
             const bitNumber = Number(BigInt.asUintN(3, reducedKey));
 
             // Bits are applied in reverse order so that they don't correlate directly with the key bytes at the same index.
-            bits.push(EncryptionTransformer.BITS[bitNumber]);
-            inverseBits.push(EncryptionTransformer.INVERSE_BITS[bitNumber]);
+            bits.push(EncryptionTransformer.#BITS[bitNumber]);
+            inverseBits.push(EncryptionTransformer.#INVERSE_BITS[bitNumber]);
         }
 
         // Domains occupying a single byte will not shuffle and will map all values to themselves for very small domains.
         if (domainBytes === 1) {
             // Determine the lowest possible mask that will cover all values in the domain.
-            const domainMask = EncryptionTransformer.BITS.filter(bit => bit < domain).reduce((accumulator, bit) => accumulator | bit, 0);
+            const domainMask = EncryptionTransformer.#BITS.filter(bit => bit < domain).reduce((accumulator, bit) => accumulator | bit, 0);
 
             // Reduce all xor bytes to a single byte and strip higher bits.
-            this._xorBytes = new Uint8Array([xorBytes.reduce((accumulator, xorByte) => accumulator ^ xorByte, 0) & domainMask]);
+            this.#xorBytes = new Uint8Array([xorBytes.reduce((accumulator, xorByte) => accumulator ^ xorByte, 0) & domainMask]);
 
             // Bits and inverse bits are irrelevant as there will be no shuffling; choose first bit arbitrarily.
-            this._bits = new Uint8Array([EncryptionTransformer.BITS[0]]);
-            this._inverseBits = new Uint8Array([EncryptionTransformer.INVERSE_BITS[0]]);
+            this.#bits = new Uint8Array([EncryptionTransformer.#BITS[0]]);
+            this.#inverseBits = new Uint8Array([EncryptionTransformer.#INVERSE_BITS[0]]);
 
             // Everything will be done in one round.
-            this._rounds = 1;
+            this.#rounds = 1;
         } else {
-            this._xorBytes = new Uint8Array(xorBytes);
-            this._bits = new Uint8Array(bits);
-            this._inverseBits = new Uint8Array(inverseBits);
-            this._rounds = xorBytes.length;
+            this.#xorBytes = new Uint8Array(xorBytes);
+            this.#bits = new Uint8Array(bits);
+            this.#inverseBits = new Uint8Array(inverseBits);
+            this.#rounds = xorBytes.length;
         }
     }
 
@@ -439,11 +439,11 @@ export class EncryptionTransformer extends Transformer {
      * @returns
      * Big-endian byte array equivalent to the value.
      */
-    private valueToBytes(value: bigint): Uint8Array {
-        const bytes = new Uint8Array(this._domainBytes);
+    #valueToBytes(value: bigint): Uint8Array {
+        const bytes = new Uint8Array(this.#domainBytes);
 
         // Build byte array in reverse order to get as big-endian.
-        for (let index = this._domainBytes - 1, reducedValue = value; index >= 0 && reducedValue !== 0n; index--, reducedValue >>= 8n) {
+        for (let index = this.#domainBytes - 1, reducedValue = value; index >= 0 && reducedValue !== 0n; index--, reducedValue >>= 8n) {
             bytes[index] = Number(BigInt.asUintN(8, reducedValue));
         }
 
@@ -459,7 +459,7 @@ export class EncryptionTransformer extends Transformer {
      * @returns
      * Value.
      */
-    private static bytesToValue(bytes: Uint8Array): bigint {
+    static #bytesToValue(bytes: Uint8Array): bigint {
         return bytes.reduce((accumulator, byte) => accumulator << 8n | BigInt(byte), 0n);
     }
 
@@ -493,7 +493,7 @@ export class EncryptionTransformer extends Transformer {
      * @returns
      * Shuffled byte array.
      */
-    private shuffle(bytes: Uint8Array, round: number, forward: boolean): Uint8Array {
+    #shuffle(bytes: Uint8Array, round: number, forward: boolean): Uint8Array {
         const bytesLength = bytes.length;
 
         const determinants = new Uint8Array(bytesLength);
@@ -501,7 +501,7 @@ export class EncryptionTransformer extends Transformer {
         const shuffleIndexes1 = new Array<number>();
         const shuffleIndexes0 = new Array<number>();
 
-        const bit = this._bits[round];
+        const bit = this.#bits[round];
 
         bytes.forEach((byte, index) => {
             const determinant = byte & bit;
@@ -512,7 +512,7 @@ export class EncryptionTransformer extends Transformer {
             (determinant !== 0 ? shuffleIndexes1 : shuffleIndexes0).push(index);
         });
 
-        const inverseBit = this._inverseBits[round];
+        const inverseBit = this.#inverseBits[round];
 
         const shuffleBytes = new Uint8Array(bytesLength);
 
@@ -560,8 +560,8 @@ export class EncryptionTransformer extends Transformer {
      * @returns
      * Xored byte array.
      */
-    private xor(bytes: Uint8Array, round: number, forward: boolean): Uint8Array {
-        let cumulativeXorByte = this._xorBytes[round];
+    #xor(bytes: Uint8Array, round: number, forward: boolean): Uint8Array {
+        let cumulativeXorByte = this.#xorBytes[round];
 
         return bytes.map((byte) => {
             const xorByte = byte ^ cumulativeXorByte;
@@ -576,17 +576,17 @@ export class EncryptionTransformer extends Transformer {
      * @inheritDoc
      */
     protected doForward(value: bigint): bigint {
-        let bytes = this.valueToBytes(value);
+        let bytes = this.#valueToBytes(value);
         let transformedValue: bigint;
 
         // Loop repeats until transformed value is within domain.
         do {
             // Forward operation is shuffle then xor for the number of rounds.
-            for (let round = 0; round < this._rounds; round++) {
-                bytes = this.xor(this.shuffle(bytes, round, true), round, true);
+            for (let round = 0; round < this.#rounds; round++) {
+                bytes = this.#xor(this.#shuffle(bytes, round, true), round, true);
             }
 
-            transformedValue = EncryptionTransformer.bytesToValue(bytes);
+            transformedValue = EncryptionTransformer.#bytesToValue(bytes);
         } while (transformedValue >= this.domain);
 
         return transformedValue;
@@ -596,17 +596,17 @@ export class EncryptionTransformer extends Transformer {
      * @inheritDoc
      */
     protected doReverse(transformedValue: bigint): bigint {
-        let bytes = this.valueToBytes(transformedValue);
+        let bytes = this.#valueToBytes(transformedValue);
         let value: bigint;
 
         // Loop repeats until value is within domain.
         do {
             // Reverse operation is xor then shuffle for the number of rounds in reverse.
-            for (let round = this._rounds - 1; round >= 0; round--) {
-                bytes = this.shuffle(this.xor(bytes, round, false), round, false);
+            for (let round = this.#rounds - 1; round >= 0; round--) {
+                bytes = this.#shuffle(this.#xor(bytes, round, false), round, false);
             }
 
-            value = EncryptionTransformer.bytesToValue(bytes);
+            value = EncryptionTransformer.#bytesToValue(bytes);
         } while (value >= this.domain);
 
         return value;
