@@ -266,46 +266,39 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
 }
 
 /**
- * Maximum string length.
- */
-// Value is external to class because private static fields are initialized first.
-const MAXIMUM_STRING_LENGTH = 40;
-
-/**
- * Create powers of a given base from 1 (`base**0`) to `base**MAXIMUM_STRING_LENGTH`.
- *
- * @param base
- * Number base.
- *
- * @returns
- * Array of powers of base.
- */
-// Function is external to class because private static fields are initialized first.
-function createPowersOf(base: number): readonly bigint[] {
-    const powersOf = new Array<bigint>(MAXIMUM_STRING_LENGTH + 1);
-
-    const baseN = BigInt(base);
-
-    for (let index = 0, powerOf = 1n; index <= MAXIMUM_STRING_LENGTH; index++, powerOf *= baseN) {
-        powersOf[index] = powerOf;
-    }
-
-    return powersOf;
-}
-
-/**
  * Character set creator. Maps numeric values to strings using the character set as digits.
  */
 export class CharacterSetCreator extends CharacterSetValidator {
     /**
      * Maximum string length supported.
      */
-    static readonly MAXIMUM_STRING_LENGTH = MAXIMUM_STRING_LENGTH;
+    static readonly MAXIMUM_STRING_LENGTH = 40;
 
     /**
      * Powers of 10 from 1 (`10**0`) to `10**MAXIMUM_STRING_LENGTH`.
      */
-    static readonly #POWERS_OF_10: readonly bigint[] = createPowersOf(10);
+    static #POWERS_OF_10?: readonly bigint[];
+
+    /**
+     * Create powers of a given base from 1 (`base**0`) to `base**MAXIMUM_STRING_LENGTH`.
+     *
+     * @param base
+     * Number base.
+     *
+     * @returns
+     * Array of powers of base.
+     */
+    static #createPowersOf(base: number): readonly bigint[] {
+        const powersOf = new Array<bigint>(this.MAXIMUM_STRING_LENGTH + 1);
+
+        const baseN = BigInt(base);
+
+        for (let index = 0, powerOf = 1n; index <= this.MAXIMUM_STRING_LENGTH; index++, powerOf *= baseN) {
+            powersOf[index] = powerOf;
+        }
+
+        return powersOf;
+    }
 
     /**
      * Get a power of 10.
@@ -317,6 +310,9 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * `10**power`.
      */
     static powerOf10(power: number): bigint {
+        // Initialization is here due to order in which class is constructed causing errors reading undefined.
+        CharacterSetCreator.#POWERS_OF_10 ??= CharacterSetCreator.#createPowersOf(10);
+
         return CharacterSetCreator.#POWERS_OF_10[power];
     }
 
@@ -358,7 +354,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
 
         const exclusionDomains: Array<readonly bigint[]> = [];
 
-        const exclusionNoneDomains = createPowersOf(this.characterSetSize);
+        const exclusionNoneDomains = CharacterSetCreator.#createPowersOf(this.characterSetSize);
 
         exclusionDomains[Exclusions.None] = exclusionNoneDomains;
 
