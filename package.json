@@ -31,6 +31,6 @@
     "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "1.0.27-alpha.202512062221"
+    "@aidc-toolkit/core": "1.0.27-alpha.202512091510"
   }
 }
