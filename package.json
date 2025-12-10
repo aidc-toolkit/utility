@@ -1,6 +1,6 @@
 {
   "name": "@aidc-toolkit/utility",
-  "version": "1.0.27-alpha",
+  "version": "1.0.27-beta",
   "description": "Foundational utilities for AIDC Toolkit",
   "type": "module",
   "main": "dist/index.js",
@@ -27,10 +27,10 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@aidc-toolkit/dev": "1.0.27-alpha.202512100323",
+    "@aidc-toolkit/dev": "1.0.27-beta",
     "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "1.0.27-alpha.202512100323"
+    "@aidc-toolkit/core": "1.0.27-beta"
   }
 }
