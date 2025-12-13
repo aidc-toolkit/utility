@@ -27,10 +27,10 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@aidc-toolkit/dev": "1.0.27-beta",
+    "@aidc-toolkit/dev": "1.0.28-alpha.202512132044",
     "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "1.0.28-alpha.202512101619"
+    "@aidc-toolkit/core": "1.0.28-alpha.202512132044"
   }
 }
