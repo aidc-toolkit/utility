@@ -15,11 +15,15 @@
  * limitations under the License.
  */
 export * from "./locale/i18n.js";
+
 export * from "./sequence.js";
 export * from "./iterable-utility.js";
 export * from "./transformer.js";
+
 export type * from "./string.js";
 export * from "./reg-exp.js";
 export * from "./record.js";
 export * from "./exclusion.js";
 export * from "./character-set.js";
+
+export type * from "./hyperlink.js";
