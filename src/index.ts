@@ -25,5 +25,3 @@ export * from "./reg-exp.js";
 export * from "./record.js";
 export * from "./exclusion.js";
 export * from "./character-set.js";
-
-export type * from "./hyperlink.js";
