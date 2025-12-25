@@ -1,3 +1,4 @@
+import type { CoreLocaleResources } from "@aidc-toolkit/core";
 import type { UtilityLocaleResources } from "./i18n.js";
 
 /**
@@ -10,6 +11,7 @@ declare module "i18next" {
     interface CustomTypeOptions {
         defaultNS: "aidct_utility";
         resources: {
+            aidct_core: CoreLocaleResources;
             aidct_utility: UtilityLocaleResources;
         };
     }
