@@ -127,9 +127,9 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
             expect(sequential).toBe(false);
             expect(index).toBe(domain);
 
-            const randomValues = new Array<bigint>();
-            const straightRandomValues = new Array<string>();
-            const sparseRandomValues = new Array<string>();
+            const randomValues: bigint[] = [];
+            const straightRandomValues: string[] = [];
+            const sparseRandomValues: string[] = [];
 
             for (let i = 0; i < 1000; i++) {
                 const randomValue = BigInt(Math.floor(Math.random() * domain));

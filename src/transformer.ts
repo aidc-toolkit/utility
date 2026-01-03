@@ -391,9 +391,9 @@ export class EncryptionTransformer extends Transformer {
 
         this.#domainBytes = domainBytes;
 
-        const xorBytes = new Array<number>();
-        const bits = new Array<number>();
-        const inverseBits = new Array<number>();
+        const xorBytes: number[] = [];
+        const bits: number[] = [];
+        const inverseBits: number[] = [];
 
         // Key is the product of domain, tweak, and an 8-digit prime to force at least four rounds.
         for (let reducedKey = this.domain * BigInt(tweak) * 603868999n; reducedKey !== 0n; reducedKey >>= 8n) {
@@ -498,8 +498,8 @@ export class EncryptionTransformer extends Transformer {
 
         const determinants = new Uint8Array(bytesLength);
 
-        const shuffleIndexes1 = new Array<number>();
-        const shuffleIndexes0 = new Array<number>();
+        const shuffleIndexes1: number[] = [];
+        const shuffleIndexes0: number[] = [];
 
         const bit = this.#bits[round];
 

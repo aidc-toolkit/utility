@@ -29,8 +29,8 @@ function testTransformer(domain: number, tweak?: number, callback?: (value: bigi
 
     expect(sequential).toBe(tweak === undefined);
 
-    const randomValues = new Array<bigint>();
-    const transformedRandomValues = new Array<bigint>();
+    const randomValues: bigint[] = [];
+    const transformedRandomValues: bigint[] = [];
 
     for (let i = 0; i < 1000; i++) {
         const randomValue = BigInt(Math.floor(Math.random() * domain));
