@@ -21,16 +21,16 @@
   "scripts": {
     "lint": "eslint",
     "tsc:core": "tsc --project tsconfig-src.json",
-    "build:dev": "rimraf dist && npm run tsc:core -- --declarationMap --sourceMap",
+    "build:dev": "rimraf dist tsconfig-src.tsbuildinfo && npm run tsc:core -- --declarationMap --sourceMap",
     "build:release": "npm run tsc:core -- --noEmit && tsup",
     "build:doc": "npm run build:dev",
-    "test": "vitest run"
+    "test": "tsc --project tsconfig-test.json --noEmit && vitest run"
   },
   "devDependencies": {
-    "@aidc-toolkit/dev": "1.0.32-alpha.202512211159",
+    "@aidc-toolkit/dev": "1.0.32-alpha.202601082147",
     "vitest": "^4.0.16"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "1.0.32-alpha.202512211159"
+    "@aidc-toolkit/core": "1.0.32-alpha.202601082147"
   }
 }
