@@ -55,7 +55,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
         protected override createErrorMessage(_s: string): string {
             return i18nextUtility.t("CharacterSetValidator.stringMustNotBeAllNumeric");
         }
-    }(/\D/);
+    }(/\D/u);
 
     /**
      * Character set.
