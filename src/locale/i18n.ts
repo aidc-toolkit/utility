@@ -1,4 +1,4 @@
-import { coreResources, i18nCoreInit, type I18nEnvironment, i18nFinalizeInit } from "@aidc-toolkit/core";
+import { i18nCoreInit, type I18nEnvironment, i18nInit } from "@aidc-toolkit/core";
 import i18next, { type i18n, type Resource } from "i18next";
 import enLocaleResources from "./en/locale-resources.js";
 import frLocaleResources from "./fr/locale-resources.js";
@@ -11,9 +11,9 @@ export const utilityNS = "aidct_utility";
 export type UtilityLocaleResources = typeof enLocaleResources;
 
 /**
- * Utility resources.
+ * Utility resource bundle.
  */
-export const utilityResources: Resource = {
+export const utilityResourceBundle: Resource = {
     en: {
         aidct_utility: enLocaleResources
     },
@@ -33,8 +33,10 @@ export const i18nextUtility: i18n = i18next.createInstance();
  *
  * @param debug
  * Debug setting.
+ *
+ * @returns
+ * Utility resource bundle.
  */
-export async function i18nUtilityInit(environment: I18nEnvironment, debug = false): Promise<void> {
-    await i18nCoreInit(environment, debug);
-    await i18nFinalizeInit(i18nextUtility, environment, debug, utilityNS, coreResources, utilityResources);
+export async function i18nUtilityInit(environment: I18nEnvironment, debug = false): Promise<Resource> {
+    return i18nInit(i18nextUtility, environment, debug, utilityNS, utilityResourceBundle, i18nCoreInit);
 }
