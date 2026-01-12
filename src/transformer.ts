@@ -291,14 +291,14 @@ export class IdentityTransformer extends Transformer {
     /**
      * @inheritDoc
      */
-    protected doForward(value: bigint): bigint {
+    protected override doForward(value: bigint): bigint {
         return value;
     }
 
     /**
      * @inheritDoc
      */
-    protected doReverse(transformedValue: bigint): bigint {
+    protected override doReverse(transformedValue: bigint): bigint {
         return transformedValue;
     }
 }
@@ -575,7 +575,7 @@ export class EncryptionTransformer extends Transformer {
     /**
      * @inheritDoc
      */
-    protected doForward(value: bigint): bigint {
+    protected override doForward(value: bigint): bigint {
         let bytes = this.#valueToBytes(value);
         let transformedValue: bigint;
 
@@ -595,7 +595,7 @@ export class EncryptionTransformer extends Transformer {
     /**
      * @inheritDoc
      */
-    protected doReverse(transformedValue: bigint): bigint {
+    protected override doReverse(transformedValue: bigint): bigint {
         let bytes = this.#valueToBytes(transformedValue);
         let value: bigint;
 
