@@ -28,4 +28,4 @@ export default {
     RecordValidator: {
         typeNameKeyNotFound: "{{typeName}} \"{{key}}\" introuvable"
     }
-} as const;
+};
