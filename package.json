@@ -1,10 +1,10 @@
 {
   "name": "@aidc-toolkit/utility",
-  "version": "1.0.32-beta",
+  "version": "1.0.33-alpha",
   "description": "Foundational utilities for AIDC Toolkit",
   "type": "module",
   "main": "dist/index.js",
-  "homepage": "https://aidc-toolkit.com/",
+  "homepage": "https://aidc-toolkit.com",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aidc-toolkit/utility.git"
@@ -20,17 +20,18 @@
   },
   "scripts": {
     "lint": "eslint",
-    "tsc:core": "tsc --project tsconfig-src.json",
-    "build:dev": "rimraf dist tsconfig-src.tsbuildinfo && npm run tsc:core -- --declarationMap --sourceMap",
-    "build:release": "npm run tsc:core -- --noEmit && tsup --tsconfig tsconfig-tsup.json",
-    "build:doc": "npm run build:dev",
+    "tsc-src": "tsc --project tsconfig-src.json",
+    "build:alpha": "rimraf dist tsconfig-src.tsbuildinfo && npm run tsc-src -- --declarationMap --sourceMap",
+    "build:beta": "npm run build:alpha",
+    "build:prod": "npm run tsc-src -- --noEmit && tsup --tsconfig tsconfig-tsup.json",
+    "build:doc": "npm run build:alpha",
     "test": "tsc --project tsconfig-test.json --noEmit && vitest run"
   },
   "devDependencies": {
-    "@aidc-toolkit/dev": "1.0.32-beta",
-    "vitest": "^4.0.16"
+    "@aidc-toolkit/dev": "1.0.33-alpha.202601191929",
+    "vitest": "^4.0.17"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "1.0.32-beta"
+    "@aidc-toolkit/core": "1.0.33-alpha.202601191929"
   }
 }
