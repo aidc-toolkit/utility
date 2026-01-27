@@ -5,32 +5,32 @@ export class Sequence implements Iterable<bigint> {
     /**
      * Start value (inclusive).
      */
-    private readonly _startValue: bigint;
+    readonly #startValue: bigint;
 
     /**
      * End value (exclusive).
      */
-    private readonly _endValue: bigint;
+    readonly #endValue: bigint;
 
     /**
      * Count of values.
      */
-    private readonly _count: number;
+    readonly #count: number;
 
     /**
      * Delta to the next value; equal to the sign of the count.
      */
-    private readonly _nextDelta: 1n | -1n;
+    readonly #nextDelta: 1n | -1n;
 
     /**
      * Minimum value (inclusive).
      */
-    private readonly _minimumValue: bigint;
+    readonly #minimumValue: bigint;
 
     /**
      * Maximum value (inclusive).
      */
-    private readonly _maximumValue: bigint;
+    readonly #maximumValue: bigint;
 
     /**
      * Constructor.
@@ -43,18 +43,18 @@ export class Sequence implements Iterable<bigint> {
      * start value.
      */
     constructor(startValue: number | bigint, count: number) {
-        this._startValue = BigInt(startValue);
-        this._endValue = this._startValue + BigInt(count);
-        this._count = count;
+        this.#startValue = BigInt(startValue);
+        this.#endValue = this.#startValue + BigInt(count);
+        this.#count = count;
 
         if (count >= 0) {
-            this._nextDelta = 1n;
-            this._minimumValue = this._startValue;
-            this._maximumValue = this._endValue - 1n;
+            this.#nextDelta = 1n;
+            this.#minimumValue = this.#startValue;
+            this.#maximumValue = this.#endValue - 1n;
         } else {
-            this._nextDelta = -1n;
-            this._minimumValue = this._endValue + 1n;
-            this._maximumValue = this._startValue;
+            this.#nextDelta = -1n;
+            this.#minimumValue = this.#endValue + 1n;
+            this.#maximumValue = this.#startValue;
         }
     }
 
@@ -62,35 +62,35 @@ export class Sequence implements Iterable<bigint> {
      * Get the start value (inclusive).
      */
     get startValue(): bigint {
-        return this._startValue;
+        return this.#startValue;
     }
 
     /**
      * Get the end value (exclusive).
      */
     get endValue(): bigint {
-        return this._endValue;
+        return this.#endValue;
     }
 
     /**
      * Get the count of values.
      */
     get count(): number {
-        return this._count;
+        return this.#count;
     }
 
     /**
      * Get the minimum value (inclusive).
      */
     get minimumValue(): bigint {
-        return this._minimumValue;
+        return this.#minimumValue;
     }
 
     /**
      * Get the maximum value (inclusive).
      */
     get maximumValue(): bigint {
-        return this._maximumValue;
+        return this.#maximumValue;
     }
 
     /**
@@ -100,7 +100,7 @@ export class Sequence implements Iterable<bigint> {
      * Next value in sequence.
      */
     * [Symbol.iterator](): Generator<bigint> {
-        for (let value = this._startValue; value !== this._endValue; value += this._nextDelta) {
+        for (let value = this.#startValue; value !== this.#endValue; value += this.#nextDelta) {
             yield value;
         }
     }

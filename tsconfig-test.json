@@ -1,15 +1,9 @@
 {
   "extends": "@aidc-toolkit/dev/tsconfig-template.json",
-  "include": [],
+  "include": ["./test/**/*"],
   "references": [
     {
       "path": "./tsconfig-src.json"
-    },
-    {
-      "path": "./tsconfig-test.json"
-    },
-    {
-      "path": "./tsconfig-config.json"
     }
   ]
 }

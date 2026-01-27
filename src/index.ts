@@ -1,5 +1,5 @@
 /*!
- * Copyright © 2024-2025 Dolphin Data Development Ltd. and AIDC Toolkit
+ * Copyright © 2024-2026 Dolphin Data Development Ltd. and AIDC Toolkit
  * contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 export * from "./locale/i18n.js";
+
 export * from "./sequence.js";
 export * from "./iterable-utility.js";
 export * from "./transformer.js";
+
 export type * from "./string.js";
 export * from "./reg-exp.js";
 export * from "./record.js";
+export * from "./exclusion.js";
 export * from "./character-set.js";

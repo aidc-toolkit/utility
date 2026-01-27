@@ -1,4 +1,5 @@
-import type { UtilityLocaleStrings } from "./i18n.js";
+import type { CoreLocaleResources } from "@aidc-toolkit/core";
+import type { UtilityLocaleResources } from "./i18n.js";
 
 /**
  * Internationalization module.
@@ -10,7 +11,8 @@ declare module "i18next" {
     interface CustomTypeOptions {
         defaultNS: "aidct_utility";
         resources: {
-            aidct_utility: UtilityLocaleStrings;
+            aidct_core: CoreLocaleResources;
+            aidct_utility: UtilityLocaleResources;
         };
     }
 }

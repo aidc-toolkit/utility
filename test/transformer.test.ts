@@ -1,8 +1,5 @@
-import { I18NEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { EncryptionTransformer, i18nUtilityInit, IdentityTransformer, Sequence, Transformer } from "../src";
-
-await i18nUtilityInit(I18NEnvironment.CLI);
+import { EncryptionTransformer, IdentityTransformer, Sequence, Transformer } from "../src/index.js";
 
 function testTransformer(domain: number, tweak?: number, callback?: (value: bigint, forwardValue: bigint) => void): void {
     const transformer = Transformer.get(domain, tweak);
@@ -32,8 +29,8 @@ function testTransformer(domain: number, tweak?: number, callback?: (value: bigi
 
     expect(sequential).toBe(tweak === undefined);
 
-    const randomValues = new Array<bigint>();
-    const transformedRandomValues = new Array<bigint>();
+    const randomValues: bigint[] = [];
+    const transformedRandomValues: bigint[] = [];
 
     for (let i = 0; i < 1000; i++) {
         const randomValue = BigInt(Math.floor(Math.random() * domain));
@@ -123,11 +120,6 @@ describe("Encryption", () => {
     });
 
     test("Byte boundary", () => {
-        expect((Transformer.get(256n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(1);
-        expect((Transformer.get(257n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(2);
-        expect((Transformer.get(65536n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(2);
-        expect((Transformer.get(65537n, 1n) as EncryptionTransformer)["_domainBytes"]).toBe(3);
-
         testTransformer(256, 1);
         testTransformer(257, 1);
     });

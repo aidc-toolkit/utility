@@ -1,13 +1,10 @@
-import { I18NEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
-import { i18nUtilityInit, RegExpValidator } from "../src";
-
-await i18nUtilityInit(I18NEnvironment.CLI);
+import { RegExpValidator } from "../src/index.js";
 
 describe("Regular expression validator", () => {
     test("Validation", () => {
-        const anyDigitValidator = new RegExpValidator(/\d+/);
-        const allDigitValidator = new RegExpValidator(/^\d+$/);
+        const anyDigitValidator = new RegExpValidator(/\d+/u);
+        const allDigitValidator = new RegExpValidator(/^\d+$/u);
 
         expect(() => {
             anyDigitValidator.validate("ABC123DEF");
@@ -37,7 +34,7 @@ describe("Regular expression validator", () => {
                 protected override createErrorMessage(s: string): string {
                     return `Failed to validate "${s}"`;
                 }
-            }(/[A-Z]+/).validate("1234567890");
+            }(/[A-Z]+/u).validate("1234567890");
         }).toThrow("Failed to validate \"1234567890\"");
     });
 });

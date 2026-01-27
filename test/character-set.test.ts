@@ -1,17 +1,19 @@
-import { I18NEnvironment } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
 import {
-    ALPHABETIC_CREATOR, ALPHABETIC_VALIDATOR,
-    ALPHANUMERIC_CREATOR, ALPHANUMERIC_VALIDATOR,
-    CharacterSetCreator, type CharacterSetValidator,
-    Exclusion,
-    HEXADECIMAL_CREATOR, HEXADECIMAL_VALIDATOR,
-    i18nUtilityInit,
-    NUMERIC_CREATOR, NUMERIC_VALIDATOR,
+    ALPHABETIC_CREATOR,
+    ALPHABETIC_VALIDATOR,
+    ALPHANUMERIC_CREATOR,
+    ALPHANUMERIC_VALIDATOR,
+    CharacterSetCreator,
+    type CharacterSetValidator,
+    type Exclusion,
+    Exclusions,
+    HEXADECIMAL_CREATOR,
+    HEXADECIMAL_VALIDATOR,
+    NUMERIC_CREATOR,
+    NUMERIC_VALIDATOR,
     Sequence
-} from "../src";
-
-await i18nUtilityInit(I18NEnvironment.CLI);
+} from "../src/index.js";
 
 // Type is used to ensure that testCharacterSet() is not called with creator twice.
 type ValidatorNotCreator<T extends CharacterSetValidator> = T extends CharacterSetCreator ? never : T;
@@ -49,21 +51,21 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
                 expect(characterIndex).toBe(index);
             });
 
-            expect(characterSetCreator.exclusionSupport.includes(Exclusion.FirstZero)).toBe(excludeFirstZero);
-            expect(characterSetCreator.exclusionSupport.includes(Exclusion.AllNumeric)).toBe(excludeAllNumeric);
+            expect(characterSetCreator.exclusionSupport.includes(Exclusions.FirstZero)).toBe(excludeFirstZero);
+            expect(characterSetCreator.exclusionSupport.includes(Exclusions.AllNumeric)).toBe(excludeAllNumeric);
         });
 
         function testCreate(exclusion: Exclusion): void {
             let domain: number;
 
             switch (exclusion) {
-                case Exclusion.FirstZero:
-                    expect(() => characterSetCreator.create(0, 0, Exclusion.FirstZero)).toThrow("Domain 0 must be greater than 0");
+                case Exclusions.FirstZero:
+                    expect(() => characterSetCreator.create(0, 0, Exclusions.FirstZero)).toThrow("Domain 0 must be greater than 0");
                     domain = (characterSetSize - 1) * characterSetSize ** (length - 1);
                     break;
 
-                case Exclusion.AllNumeric:
-                    expect(() => characterSetCreator.create(0, 0, Exclusion.AllNumeric)).toThrow("Domain 0 must be greater than 0");
+                case Exclusions.AllNumeric:
+                    expect(() => characterSetCreator.create(0, 0, Exclusions.AllNumeric)).toThrow("Domain 0 must be greater than 0");
                     domain = characterSetSize ** length - 10 ** length;
                     break;
 
@@ -125,9 +127,9 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
             expect(sequential).toBe(false);
             expect(index).toBe(domain);
 
-            const randomValues = new Array<bigint>();
-            const straightRandomValues = new Array<string>();
-            const sparseRandomValues = new Array<string>();
+            const randomValues: bigint[] = [];
+            const straightRandomValues: string[] = [];
+            const sparseRandomValues: string[] = [];
 
             for (let i = 0; i < 1000; i++) {
                 const randomValue = BigInt(Math.floor(Math.random() * domain));
@@ -154,7 +156,7 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
             // Test can take a moderate amount of time.
             timeout: 10 * 1000
         }, () => {
-            testCreate(Exclusion.None);
+            testCreate(Exclusions.None);
         });
 
         if (excludeFirstZero) {
@@ -162,10 +164,10 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
                 // Test can take a moderate amount of time.
                 timeout: 10 * 1000
             }, () => {
-                testCreate(Exclusion.FirstZero);
+                testCreate(Exclusions.FirstZero);
 
-                expect(() => characterSetCreator.valueFor("0000", Exclusion.FirstZero)).toThrow("Invalid character '0' at position 1");
-                expect(() => characterSetCreator.valueFor("1000", Exclusion.FirstZero)).not.toThrow(RangeError);
+                expect(() => characterSetCreator.valueFor("0000", Exclusions.FirstZero)).toThrow("Invalid character '0' at position 1");
+                expect(() => characterSetCreator.valueFor("1000", Exclusions.FirstZero)).not.toThrow(RangeError);
             });
         }
 
@@ -174,15 +176,15 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
                 // Test can take a moderate amount of time.
                 timeout: 10 * 1000
             }, () => {
-                testCreate(Exclusion.AllNumeric);
+                testCreate(Exclusions.AllNumeric);
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Nine is known to be present in the character set.
                 const afterNine = characterSetCreator.character(characterSetCreator.characterIndex("9")! + 1);
 
-                expect(() => characterSetCreator.valueFor("0000", Exclusion.AllNumeric)).toThrow("String must not be all numeric");
-                expect(() => characterSetCreator.valueFor(`000${afterNine}`, Exclusion.AllNumeric)).not.toThrow(RangeError);
-                expect(() => characterSetCreator.valueFor("9999", Exclusion.AllNumeric)).toThrow("String must not be all numeric");
-                expect(() => characterSetCreator.valueFor(`999${afterNine}`, Exclusion.AllNumeric)).not.toThrow(RangeError);
+                expect(() => characterSetCreator.valueFor("0000", Exclusions.AllNumeric)).toThrow("String must not be all numeric");
+                expect(() => characterSetCreator.valueFor(`000${afterNine}`, Exclusions.AllNumeric)).not.toThrow(RangeError);
+                expect(() => characterSetCreator.valueFor("9999", Exclusions.AllNumeric)).toThrow("String must not be all numeric");
+                expect(() => characterSetCreator.valueFor(`999${afterNine}`, Exclusions.AllNumeric)).not.toThrow(RangeError);
             });
         }
     });
@@ -192,22 +194,22 @@ describe("Exclusion", () => {
     test("First zero", () => {
         expect(() => new CharacterSetCreator([
             "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
-        ], Exclusion.FirstZero)).not.toThrow(RangeError);
+        ], Exclusions.FirstZero)).not.toThrow(RangeError);
         expect(() => new CharacterSetCreator([
             "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"
-        ], Exclusion.FirstZero)).toThrow("Character set must support zero as first character");
+        ], Exclusions.FirstZero)).toThrow("Character set must support zero as first character");
     });
 
     test("All numeric", () => {
         expect(() => new CharacterSetCreator([
             "!", "#", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D"
-        ], Exclusion.AllNumeric)).not.toThrow(RangeError);
+        ], Exclusions.AllNumeric)).not.toThrow(RangeError);
         expect(() => new CharacterSetCreator([
             "!", "#", "/", "0", "1", "2", "3", "A", "B", "C", "D"
-        ], Exclusion.AllNumeric)).toThrow("Character set must support all numeric characters in sequence");
+        ], Exclusions.AllNumeric)).toThrow("Character set must support all numeric characters in sequence");
         expect(() => new CharacterSetCreator([
             "!", "#", "/", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D"
-        ], Exclusion.AllNumeric)).toThrow("Character set must support all numeric characters in sequence");
+        ], Exclusions.AllNumeric)).toThrow("Character set must support all numeric characters in sequence");
     });
 });
 
@@ -220,6 +222,6 @@ const middleNumericCreator = new CharacterSetCreator([
     "(", ")",
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "<", ">"
-], Exclusion.AllNumeric);
+], Exclusions.AllNumeric);
 
 testCharacterSet("Middle numeric", middleNumericCreator, middleNumericCreator as CharacterSetValidator, 14, 4, false, true);

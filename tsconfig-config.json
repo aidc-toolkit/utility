@@ -1,0 +1,4 @@
+{
+  "extends": "@aidc-toolkit/dev/tsconfig-template.json",
+  "files": ["./eslint.config.ts", "./tsup.config.ts", "vitest.config.ts"]
+}

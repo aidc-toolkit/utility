@@ -1,28 +1,9 @@
-import type { IndexedCallback } from "./iterable-utility";
+import { type Exclusion, Exclusions } from "./exclusion.js";
+import type { IndexedCallback } from "./iterable-utility.js";
 import { i18nextUtility } from "./locale/i18n.js";
 import { RegExpValidator } from "./reg-exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
 import { Transformer, type TransformerInput, type TransformerOutput } from "./transformer.js";
-
-/**
- * Exclusion options for validating and creating strings based on character sets.
- */
-export enum Exclusion {
-    /**
-     * No strings excluded.
-     */
-    None,
-
-    /**
-     * Strings that start with zero ('0') excluded.
-     */
-    FirstZero,
-
-    /**
-     * Strings that are all-numeric (e.g., "123456") excluded.
-     */
-    AllNumeric
-}
 
 /**
  * Character set validation parameters.
@@ -61,7 +42,7 @@ export interface CharacterSetValidation extends StringValidation {
  * Character set validator. Validates a string against a specified character set.
  */
 export class CharacterSetValidator implements StringValidator<CharacterSetValidation> {
-    private static readonly NOT_ALL_NUMERIC_VALIDATOR = new class extends RegExpValidator {
+    static readonly #NOT_ALL_NUMERIC_VALIDATOR = new class extends RegExpValidator {
         /**
          * Create an error message for an all-numeric string.
          *
@@ -74,23 +55,23 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
         protected override createErrorMessage(_s: string): string {
             return i18nextUtility.t("CharacterSetValidator.stringMustNotBeAllNumeric");
         }
-    }(/\D/);
+    }(/\D/u);
 
     /**
      * Character set.
      */
-    private readonly _characterSet: readonly string[];
+    readonly #characterSet: readonly string[];
 
     /**
      * Character set map, mapping each character in the character set to its index such that
      * `_characterSetMap.get(_characterSet[index]) === index`.
      */
-    private readonly _characterSetMap: ReadonlyMap<string, number>;
+    readonly #characterSetMap: ReadonlyMap<string, number>;
 
     /**
      * Exclusions supported by the character set.
      */
-    private readonly _exclusionSupport: readonly Exclusion[];
+    readonly #exclusionSupport: readonly Exclusion[];
 
     /**
      * Constructor.
@@ -100,10 +81,10 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * set.
      *
      * @param exclusionSupport
-     * Exclusions supported by the character set. All character sets implicitly support {@link Exclusion.None}.
+     * Exclusions supported by the character set. All character sets implicitly support {@linkcode Exclusions.None}.
      */
     constructor(characterSet: readonly string[], ...exclusionSupport: readonly Exclusion[]) {
-        this._characterSet = characterSet;
+        this.#characterSet = characterSet;
 
         const characterSetMap = new Map<string, number>();
 
@@ -111,30 +92,30 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
             characterSetMap.set(c, index);
         });
 
-        this._characterSetMap = characterSetMap;
+        this.#characterSetMap = characterSetMap;
 
-        this._exclusionSupport = exclusionSupport;
+        this.#exclusionSupport = exclusionSupport;
     }
 
     /**
      * Get the character set.
      */
     get characterSet(): readonly string[] {
-        return this._characterSet;
+        return this.#characterSet;
     }
 
     /**
      * Get the character set size.
      */
     get characterSetSize(): number {
-        return this._characterSet.length;
+        return this.#characterSet.length;
     }
 
     /**
      * Get the exclusions supported by the character set.
      */
     get exclusionSupport(): readonly Exclusion[] {
-        return this._exclusionSupport;
+        return this.#exclusionSupport;
     }
 
     /**
@@ -147,7 +128,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * Character at the index.
      */
     character(index: number): string {
-        return this._characterSet[index];
+        return this.#characterSet[index];
     }
 
     /**
@@ -160,7 +141,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * Index for the character or undefined if the character is not in the character set.
      */
     characterIndex(c: string): number | undefined {
-        return this._characterSetMap.get(c);
+        return this.#characterSetMap.get(c);
     }
 
     /**
@@ -173,7 +154,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * Array of indexes for each character or undefined if the character is not in the character set.
      */
     characterIndexes(s: string): ReadonlyArray<number | undefined> {
-        return Array.from(s).map(c => this._characterSetMap.get(c));
+        return Array.from(s).map(c => this.#characterSetMap.get(c));
     }
 
     /**
@@ -186,7 +167,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * @returns
      * Component as a string or undefined.
      */
-    private static componentToString(component: string | (() => string) | undefined): string | undefined {
+    static #componentToString(component: string | (() => string) | undefined): string | undefined {
         return typeof component === "function" ? component() : component;
     }
 
@@ -197,7 +178,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * Exclusion.
      */
     protected validateExclusion(exclusion: Exclusion): void {
-        if (exclusion !== Exclusion.None && !this._exclusionSupport.includes(exclusion)) {
+        if (exclusion !== Exclusions.None && !this.#exclusionSupport.includes(exclusion)) {
             throw new RangeError(i18nextUtility.t("CharacterSetValidator.exclusionNotSupported", {
                 exclusion
             }));
@@ -225,13 +206,13 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
 
             if (maximumLength !== undefined && maximumLength === minimumLength) {
                 errorMessage = i18nextUtility.t(validation?.component === undefined ? "CharacterSetValidator.lengthMustBeEqualTo" : "CharacterSetValidator.lengthOfComponentMustBeEqualTo", {
-                    component: CharacterSetValidator.componentToString(validation?.component),
+                    component: CharacterSetValidator.#componentToString(validation?.component),
                     length,
                     exactLength: minimumLength
                 });
             } else {
                 errorMessage = i18nextUtility.t(validation?.component === undefined ? "CharacterSetValidator.lengthMustBeGreaterThanOrEqualTo" : "CharacterSetValidator.lengthOfComponentMustBeGreaterThanOrEqualTo", {
-                    component: CharacterSetValidator.componentToString(validation?.component),
+                    component: CharacterSetValidator.#componentToString(validation?.component),
                     length,
                     minimumLength
                 });
@@ -242,7 +223,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
 
         if (maximumLength !== undefined && length > maximumLength) {
             throw new RangeError(i18nextUtility.t(validation?.component === undefined ? "CharacterSetValidator.lengthMustBeLessThanOrEqualTo" : "CharacterSetValidator.lengthOfComponentMustBeLessThanOrEqualTo", {
-                component: CharacterSetValidator.componentToString(validation?.component),
+                component: CharacterSetValidator.#componentToString(validation?.component),
                 length,
                 maximumLength
             }));
@@ -253,7 +234,7 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
 
         if (index !== -1) {
             throw new RangeError(i18nextUtility.t(validation?.component === undefined ? "CharacterSetValidator.invalidCharacterAtPosition" : "CharacterSetValidator.invalidCharacterAtPositionOfComponent", {
-                component: CharacterSetValidator.componentToString(validation?.component),
+                component: CharacterSetValidator.#componentToString(validation?.component),
                 c: s.charAt(index),
                 position: index + (validation?.positionOffset ?? 0) + 1
             }));
@@ -263,21 +244,21 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
             this.validateExclusion(validation.exclusion);
 
             switch (validation.exclusion) {
-                case Exclusion.None:
+                case Exclusions.None:
                     break;
 
-                case Exclusion.FirstZero:
+                case Exclusions.FirstZero:
                     if (s.startsWith("0")) {
                         throw new RangeError(i18nextUtility.t(validation.component === undefined ? "CharacterSetValidator.invalidCharacterAtPosition" : "CharacterSetValidator.invalidCharacterAtPositionOfComponent", {
-                            component: CharacterSetValidator.componentToString(validation.component),
+                            component: CharacterSetValidator.#componentToString(validation.component),
                             c: "0",
                             position: (validation.positionOffset ?? 0) + 1
                         }));
                     }
                     break;
 
-                case Exclusion.AllNumeric:
-                    CharacterSetValidator.NOT_ALL_NUMERIC_VALIDATOR.validate(s);
+                case Exclusions.AllNumeric:
+                    CharacterSetValidator.#NOT_ALL_NUMERIC_VALIDATOR.validate(s);
                     break;
             }
         }
@@ -296,7 +277,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
     /**
      * Powers of 10 from 1 (`10**0`) to `10**MAXIMUM_STRING_LENGTH`.
      */
-    private static readonly _powersOf10: readonly bigint[] = CharacterSetCreator.createPowersOf(10);
+    static #POWERS_OF_10?: readonly bigint[];
 
     /**
      * Create powers of a given base from 1 (`base**0`) to `base**MAXIMUM_STRING_LENGTH`.
@@ -307,7 +288,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * Array of powers of base.
      */
-    private static createPowersOf(base: number): readonly bigint[] {
+    static #createPowersOf(base: number): readonly bigint[] {
         const powersOf = new Array<bigint>(this.MAXIMUM_STRING_LENGTH + 1);
 
         const baseN = BigInt(base);
@@ -329,28 +310,31 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * `10**power`.
      */
     static powerOf10(power: number): bigint {
-        return this._powersOf10[power];
+        // Initialization is here due to order in which class is constructed causing errors reading undefined.
+        CharacterSetCreator.#POWERS_OF_10 ??= CharacterSetCreator.#createPowersOf(10);
+
+        return CharacterSetCreator.#POWERS_OF_10[power];
     }
 
     /**
      * Character set size as big integer, cached for performance purposes.
      */
-    private readonly _characterSetSizeN: bigint;
+    readonly #characterSetSizeN: bigint;
 
     /**
      * Character set size minus 1 as big integer, cached for performance purposes.
      */
-    private readonly _characterSetSizeMinusOneN: bigint;
+    readonly #characterSetSizeMinusOneN: bigint;
 
     /**
-     * Domains for every length for every supported {@link Exclusion}.
+     * Domains for every length for every supported {@linkcode Exclusions}.
      */
-    private readonly _exclusionDomains: ReadonlyArray<readonly bigint[]>;
+    readonly #exclusionDomains: ReadonlyArray<readonly bigint[]>;
 
     /**
      * Values that would generate all zeros in the created string.
      */
-    private readonly _allZerosValues: readonly bigint[];
+    readonly #allZerosValues: readonly bigint[];
 
     /**
      * Constructor.
@@ -360,21 +344,21 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * set.
      *
      * @param exclusionSupport
-     * Exclusions supported by the character set. All character sets implicitly support {@link Exclusion.None}.
+     * Exclusions supported by the character set. All character sets implicitly support {@linkcode Exclusions.None}.
      */
     constructor(characterSet: readonly string[], ...exclusionSupport: readonly Exclusion[]) {
         super(characterSet, ...exclusionSupport);
 
-        this._characterSetSizeN = BigInt(this.characterSetSize);
-        this._characterSetSizeMinusOneN = BigInt(this.characterSetSize - 1);
+        this.#characterSetSizeN = BigInt(this.characterSetSize);
+        this.#characterSetSizeMinusOneN = BigInt(this.characterSetSize - 1);
 
         const exclusionDomains: Array<readonly bigint[]> = [];
 
-        const exclusionNoneDomains = CharacterSetCreator.createPowersOf(this.characterSetSize);
+        const exclusionNoneDomains = CharacterSetCreator.#createPowersOf(this.characterSetSize);
 
-        exclusionDomains[Exclusion.None] = exclusionNoneDomains;
+        exclusionDomains[Exclusions.None] = exclusionNoneDomains;
 
-        if (exclusionSupport.includes(Exclusion.FirstZero)) {
+        if (exclusionSupport.includes(Exclusions.FirstZero)) {
             if (characterSet[0] !== "0") {
                 throw new RangeError(i18nextUtility.t("CharacterSetValidator.firstZeroFirstCharacter"));
             }
@@ -386,13 +370,13 @@ export class CharacterSetCreator extends CharacterSetValidator {
 
             for (let index = 1; index <= CharacterSetCreator.MAXIMUM_STRING_LENGTH; index++) {
                 // Domain excludes zero as the first character and so works with previous exclusion none domain.
-                exclusionFirstZeroDomains[index] = this._characterSetSizeMinusOneN * exclusionNoneDomains[index - 1];
+                exclusionFirstZeroDomains[index] = this.#characterSetSizeMinusOneN * exclusionNoneDomains[index - 1];
             }
 
-            exclusionDomains[Exclusion.FirstZero] = exclusionFirstZeroDomains;
+            exclusionDomains[Exclusions.FirstZero] = exclusionFirstZeroDomains;
         }
 
-        if (exclusionSupport.includes(Exclusion.AllNumeric)) {
+        if (exclusionSupport.includes(Exclusions.AllNumeric)) {
             const exclusionAllNumericDomains = new Array<bigint>(CharacterSetCreator.MAXIMUM_STRING_LENGTH + 1);
 
             /**
@@ -431,18 +415,18 @@ export class CharacterSetCreator extends CharacterSetValidator {
 
                 allZerosValues[index] = allZerosValue;
 
-                allZerosValue = allZerosValue * this._characterSetSizeN + zeroIndex;
+                allZerosValue = allZerosValue * this.#characterSetSizeN + zeroIndex;
             }
 
-            this._allZerosValues = allZerosValues;
+            this.#allZerosValues = allZerosValues;
 
-            exclusionDomains[Exclusion.AllNumeric] = exclusionAllNumericDomains;
+            exclusionDomains[Exclusions.AllNumeric] = exclusionAllNumericDomains;
         } else {
             // Empty array obviates need for non-null assertion while still forcing error if indexed due to a bug.
-            this._allZerosValues = [];
+            this.#allZerosValues = [];
         }
 
-        this._exclusionDomains = exclusionDomains;
+        this.#exclusionDomains = exclusionDomains;
     }
 
     /**
@@ -454,8 +438,8 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * `characterSetSize**power`.
      */
-    private powerOfSize(power: number): bigint {
-        return this._exclusionDomains[Exclusion.None][power];
+    #powerOfSize(power: number): bigint {
+        return this.#exclusionDomains[Exclusions.None][power];
     }
 
     /**
@@ -473,7 +457,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * Shift required to skip all all-numeric strings.
      */
-    private allNumericShift(shiftForward: boolean, length: number, value: bigint): bigint {
+    #allNumericShift(shiftForward: boolean, length: number, value: bigint): bigint {
         let shift: bigint;
 
         if (length === 0) {
@@ -485,7 +469,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
             // Now dealing with individual characters; shift by 10 to skip numeric characters.
             shift = 10n;
         } else {
-            const powerOfSize = this.powerOfSize(length);
+            const powerOfSize = this.#powerOfSize(length);
             const powerOf10 = CharacterSetCreator.powerOf10(length);
 
             // Calculate the gap to the next numeric string of equal length with incremental first character.
@@ -499,7 +483,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
                 shift = CharacterSetCreator.powerOf10(length + 1);
             } else {
                 // Shift is the number of gaps times the current power of 10 plus the shift for the next length down with value adjusted by the number of gaps times the gap.
-                shift = gaps * powerOf10 + this.allNumericShift(shiftForward, length - 1, value - gaps * gap);
+                shift = gaps * powerOf10 + this.#allNumericShift(shiftForward, length - 1, value - gaps * gap);
             }
         }
 
@@ -507,12 +491,12 @@ export class CharacterSetCreator extends CharacterSetValidator {
     }
 
     /**
-     * Validate that a length is less than or equal to {@link MAXIMUM_STRING_LENGTH}. If not, an error is thrown.
+     * Validate that a length is less than or equal to {@linkcode MAXIMUM_STRING_LENGTH}. If not, an error is thrown.
      *
      * @param length
      * Length.
      */
-    private validateLength(length: number): void {
+    #validateLength(length: number): void {
         if (length < 0) {
             throw new RangeError(i18nextUtility.t("CharacterSetValidator.lengthMustBeGreaterThanOrEqualTo", {
                 length,
@@ -542,7 +526,8 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * Numeric value(s) of the string(s).
      *
      * @param exclusion
-     * String(s) to be excluded from the range of outputs. See {@link Exclusion} for possible values and their meaning.
+     * String(s) to be excluded from the range of outputs. See {@linkcode Exclusions} for possible values and their
+     * meaning.
      *
      * @param tweak
      * If provided, the numerical value of the string(s) is/are "tweaked" using an {@link EncryptionTransformer |
@@ -554,14 +539,14 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * String(s) created from the value(s).
      */
-    create<TTransformerInput extends TransformerInput<number | bigint>>(length: number, valueOrValues: TTransformerInput, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): TransformerOutput<TTransformerInput, string> {
-        this.validateLength(length);
+    create<TTransformerInput extends TransformerInput<number | bigint>>(length: number, valueOrValues: TTransformerInput, exclusion: Exclusion = Exclusions.None, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): TransformerOutput<TTransformerInput, string> {
+        this.#validateLength(length);
         this.validateExclusion(exclusion);
 
         // Zero value in ternary else obviates need for non-null assertion.
-        const allZerosValue = exclusion === Exclusion.AllNumeric ? this._allZerosValues[length] : 0n;
+        const allZerosValue = exclusion === Exclusions.AllNumeric ? this.#allZerosValues[length] : 0n;
 
-        const transformer = Transformer.get(this._exclusionDomains[exclusion][length], tweak);
+        const transformer = Transformer.get(this.#exclusionDomains[exclusion][length], tweak);
 
         return transformer.forward(valueOrValues, (transformedValue, index) => {
             let s = "";
@@ -570,23 +555,23 @@ export class CharacterSetCreator extends CharacterSetValidator {
             if (length !== 0) {
                 let convertValue = transformedValue;
 
-                if (exclusion === Exclusion.AllNumeric && convertValue >= allZerosValue) {
+                if (exclusion === Exclusions.AllNumeric && convertValue >= allZerosValue) {
                     // Value to convert is shifted by the number of all-numeric strings that occur at or prior to it.
-                    convertValue = convertValue + this.allNumericShift(true, length, convertValue - allZerosValue);
+                    convertValue += this.#allNumericShift(true, length, convertValue - allZerosValue);
                 }
 
                 // Build string from right to left excluding the first character.
                 for (let position = length - 1; position > 0; position--) {
-                    const nextConvertValue = convertValue / this._characterSetSizeN;
+                    const nextConvertValue = convertValue / this.#characterSetSizeN;
 
                     // First step is effectively a modulus calculation.
-                    s = this.character(Number(convertValue - nextConvertValue * this._characterSetSizeN)) + s;
+                    s = this.character(Number(convertValue - nextConvertValue * this.#characterSetSizeN)) + s;
 
                     convertValue = nextConvertValue;
                 }
 
                 // Zero is first in the character set for those that support excluding first zero.
-                s = this.character(exclusion === Exclusion.FirstZero ? Number(convertValue % this._characterSetSizeMinusOneN) + 1 : Number(convertValue % this._characterSetSizeN)) + s;
+                s = this.character(exclusion === Exclusions.FirstZero ? Number(convertValue % this.#characterSetSizeMinusOneN) + 1 : Number(convertValue % this.#characterSetSizeN)) + s;
             }
 
             return creatorCallback === undefined ? s : creatorCallback(s, index);
@@ -600,7 +585,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * String.
      *
      * @param exclusion
-     * Strings excluded from the range of inputs. See {@link Exclusion} for possible values and their meaning.
+     * Strings excluded from the range of inputs. See {@linkcode Exclusions} for possible values and their meaning.
      *
      * @param tweak
      * If provided, the numerical value of the string was "tweaked" using an {@link EncryptionTransformer | encryption
@@ -609,10 +594,10 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * Numeric value of the string.
      */
-    valueFor(s: string, exclusion: Exclusion = Exclusion.None, tweak?: number | bigint): bigint {
+    valueFor(s: string, exclusion: Exclusion = Exclusions.None, tweak?: number | bigint): bigint {
         const length = s.length;
 
-        this.validateLength(length);
+        this.#validateLength(length);
         this.validateExclusion(exclusion);
 
         const characterSetSizeN = BigInt(this.characterSetSize);
@@ -628,7 +613,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
 
             let value: bigint;
 
-            if (index === 0 && exclusion === Exclusion.FirstZero) {
+            if (index === 0 && exclusion === Exclusions.FirstZero) {
                 if (characterIndex === 0) {
                     throw new RangeError(i18nextUtility.t("CharacterSetValidator.invalidCharacterAtPosition", {
                         c: "0",
@@ -645,43 +630,43 @@ export class CharacterSetCreator extends CharacterSetValidator {
             return value;
         }, 0n);
 
-        if (exclusion === Exclusion.AllNumeric) {
-            const allZerosValue = this._allZerosValues[length];
+        if (exclusion === Exclusions.AllNumeric) {
+            const allZerosValue = this.#allZerosValues[length];
 
             if (value >= allZerosValue) {
                 // Call will ensure that string is not all-numeric.
-                value -= this.allNumericShift(false, length, value - allZerosValue);
+                value -= this.#allNumericShift(false, length, value - allZerosValue);
             }
         }
 
-        return Transformer.get(this._exclusionDomains[exclusion][length], tweak).reverse(value);
+        return Transformer.get(this.#exclusionDomains[exclusion][length], tweak).reverse(value);
     }
 }
 
 /**
- * Numeric creator. Character set is 0-9. Supports {@link Exclusion.FirstZero}.
+ * Numeric creator. Character set is 0-9. Supports {@linkcode Exclusions.FirstZero}.
  */
 export const NUMERIC_CREATOR = new CharacterSetCreator([
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
-], Exclusion.FirstZero);
+], Exclusions.FirstZero);
 
 /**
- * Numeric validator. Character set is 0-9. Supports {@link Exclusion.FirstZero}.
+ * Numeric validator. Character set is 0-9. Supports {@linkcode Exclusions.FirstZero}.
  */
 export const NUMERIC_VALIDATOR = NUMERIC_CREATOR as CharacterSetValidator;
 
 /**
- * Hexadecimal creator. Character set is 0-9, A-F. Supports {@link Exclusion.FirstZero} and {@link
- * Exclusion.AllNumeric}.
+ * Hexadecimal creator. Character set is 0-9, A-F. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
+ * Exclusions.AllNumeric}.
  */
 export const HEXADECIMAL_CREATOR = new CharacterSetCreator([
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "A", "B", "C", "D", "E", "F"
-], Exclusion.FirstZero, Exclusion.AllNumeric);
+], Exclusions.FirstZero, Exclusions.AllNumeric);
 
 /**
- * Hexadecimal validator. Character set is 0-9, A-F. Supports {@link Exclusion.FirstZero} and {@link
- * Exclusion.AllNumeric}.
+ * Hexadecimal validator. Character set is 0-9, A-F. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
+ * Exclusions.AllNumeric}.
  */
 export const HEXADECIMAL_VALIDATOR = HEXADECIMAL_CREATOR as CharacterSetValidator;
 
@@ -699,17 +684,17 @@ export const ALPHABETIC_CREATOR = new CharacterSetCreator([
 export const ALPHABETIC_VALIDATOR = ALPHABETIC_CREATOR as CharacterSetValidator;
 
 /**
- * Alphanumeric creator. Character set is 0-9, A-Z. Supports {@link Exclusion.FirstZero} and {@link
- * Exclusion.AllNumeric}.
+ * Alphanumeric creator. Character set is 0-9, A-Z. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
+ * Exclusions.AllNumeric}.
  */
 export const ALPHANUMERIC_CREATOR = new CharacterSetCreator([
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
     "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
-], Exclusion.FirstZero, Exclusion.AllNumeric);
+], Exclusions.FirstZero, Exclusions.AllNumeric);
 
 /**
- * Alphanumeric validator. Character set is 0-9, A-Z. Supports {@link Exclusion.FirstZero} and {@link
- * Exclusion.AllNumeric}.
+ * Alphanumeric validator. Character set is 0-9, A-Z. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
+ * Exclusions.AllNumeric}.
  */
 export const ALPHANUMERIC_VALIDATOR = ALPHANUMERIC_CREATOR as CharacterSetValidator;

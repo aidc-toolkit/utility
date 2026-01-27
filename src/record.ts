@@ -12,12 +12,12 @@ export class RecordValidator<T> implements StringValidator {
     /**
      * Type name for error message.
      */
-    private readonly _typeName: string;
+    readonly #typeName: string;
 
     /**
      * Record in which to look up keys.
      */
-    private readonly _record: Readonly<Record<string, T>>;
+    readonly #record: Readonly<Record<string, T>>;
 
     /**
      * Constructor.
@@ -29,22 +29,22 @@ export class RecordValidator<T> implements StringValidator {
      * Record in which to look up keys.
      */
     constructor(typeName: string, record: Readonly<Record<string, T>>) {
-        this._typeName = typeName;
-        this._record = record;
+        this.#typeName = typeName;
+        this.#record = record;
     }
 
     /**
      * Get the type name.
      */
     get typeName(): string {
-        return this._typeName;
+        return this.#typeName;
     }
 
     /**
      * Get the record.
      */
     get record(): Readonly<Record<string, T>> {
-        return this._record;
+        return this.#record;
     }
 
     /**
