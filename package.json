@@ -1,6 +1,6 @@
 {
   "name": "@aidc-toolkit/utility",
-  "version": "1.0.41-alpha",
+  "version": "1.0.41-beta",
   "description": "Foundational utilities for AIDC Toolkit",
   "type": "module",
   "main": "dist/index.js",
@@ -29,10 +29,10 @@
     "test": "tsc --project tsconfig-test.json --noEmit && vitest run"
   },
   "devDependencies": {
-    "@aidc-toolkit/dev": "1.0.39-alpha.202601271709",
+    "@aidc-toolkit/dev": "1.0.39-beta",
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "1.0.40-alpha.202601271709"
+    "@aidc-toolkit/core": "1.0.40-beta"
   }
 }
