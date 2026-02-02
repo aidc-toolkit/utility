@@ -26,6 +26,6 @@ export default {
         endSequenceValueMustBeLessThanOrEqualTo: "La valeur de la séquence de fin (valeur de la séquence de début + nombre - 1) doit être inférieure à {{domain, number}}"
     },
     RecordValidator: {
-        typeNameKeyNotFound: "{{typeName}} \"{{key}}\" introuvable"
+        typeNameKeyNotFound: "{{typeName}} « {{key}} » introuvable"
     }
 };
