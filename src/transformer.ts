@@ -3,36 +3,6 @@ import { i18nextUtility } from "./locale/i18n.js";
 import { Sequence } from "./sequence.js";
 
 /**
- * Transformer primitive type.
- */
-export type TransformerPrimitive = string | number | bigint | boolean;
-
-/**
- * Transformer input type, one of:
- *
- * - TInput (primitive type)
- * - Iterable\<TInput\>
- *
- * @template TInput
- * Transformer input primitive type.
- */
-export type TransformerInput<TInput extends TransformerPrimitive> = TInput | Iterable<TInput>;
-
-/**
- * Transformer output, based on transformer input:
- *
- * - If type TTransformerInput is primitive, result is type TOutput.
- * - If type TTransformerInput is Iterable, result is type Iterable\<TOutput\>.
- *
- * @template TTransformerInput
- * Transformer input type.
- *
- * @template TOutput
- * Output base type.
- */
-export type TransformerOutput<TTransformerInput extends TransformerInput<TransformerPrimitive>, TOutput> = TTransformerInput extends (TTransformerInput extends TransformerInput<infer TInput> ? TInput : never) ? TOutput : Iterable<TOutput>;
-
-/**
  * Transformer that transforms values in a numeric domain to values in a range equal to the domain or to another range
  * defined by a callback function. In other words, the domain determines valid input values and, without a callback, the
  * range of valid output values.
@@ -90,7 +60,7 @@ export abstract class Transformer {
      * Tweak.
      *
      * @returns
-     * {@linkcode IdentityTransformer} if tweak is undefined, {@linkcode EncryptionTransformer} if tweak is defined.
+     * Transformer.
      */
     static get(domain: number | bigint, tweak?: number | bigint): Transformer {
         const domainN = BigInt(domain);
@@ -190,45 +160,72 @@ export abstract class Transformer {
     };
 
     /**
-     * Transform value(s) forward.
+     * Transform a value forward.
      *
-     * @template TTransformerInput
-     * Value(s) input type.
-     *
-     * @param valueOrValues
-     * Value(s). If this is an instance of {@linkcode Sequence}, the minimum and maximum values are validated prior to
-     * transformation. Otherwise, the individual value(s) is/are validated at the time of transformation.
+     * @param value
+     * Value.
      *
      * @returns
-     * Transformed value(s).
+     * Transformed value.
      */
-    forward<TTransformerInput extends TransformerInput<number | bigint>>(valueOrValues: TTransformerInput): TransformerOutput<TTransformerInput, bigint>;
+    forward(value: number | bigint): bigint;
 
     /**
-     * Transform value(s) forward, optionally applying a transformation.
-     *
-     * @template TTransformerInput
-     * Value(s) input type.
+     * Transform a value forward and apply another transformation.
      *
      * @template TOutput
-     * Transformation callback output type.
+     * Transformer callback output type.
      *
-     * @param valueOrValues
-     * Value(s). If this is an instance of {@linkcode Sequence}, the minimum and maximum values are validated prior to
-     * transformation. Otherwise, the individual value(s) is/are validated at the time of transformation.
+     * @param value
+     * Value.
      *
      * @param transformerCallback
-     * Called after each value is transformed to convert it to its final value.
+     * Called with interim transformed value to transform it to its final value.
      *
      * @returns
-     * Transformed value(s).
+     * Transformed value.
      */
-    forward<TTransformerInput extends TransformerInput<number | bigint>, TOutput>(valueOrValues: TTransformerInput, transformerCallback: IndexedCallback<bigint, TOutput>): TransformerOutput<TTransformerInput, TOutput>;
+    forward<TOutput>(value: number | bigint, transformerCallback: IndexedCallback<bigint, TOutput>): TOutput;
+
+    /**
+     * Transform values forward.
+     *
+     * @param values
+     * Values. If this is an instance of {@linkcode Sequence}, the minimum and maximum values are validated prior to
+     * transformation. Otherwise, the individual values are validated at the time of each transformation.
+     *
+     * @returns
+     * Transformed values.
+     */
+    forward(values: Iterable<number | bigint>): Iterable<bigint>;
+
+    /**
+     * Transform values forward and apply another transformation to each.
+     *
+     * @template TOutput
+     * Transformer callback output type.
+     *
+     * @param values
+     * Values. If this is an instance of {@linkcode Sequence}, the minimum and maximum values are validated prior to
+     * transformation. Otherwise, the individual values are validated at the time of each transformation.
+     *
+     * @param transformerCallback
+     * Called with each interim transformed value to transform it to its final value.
+     *
+     * @returns
+     * Transformed values.
+     */
+    forward<TOutput>(values: Iterable<number | bigint>, transformerCallback: IndexedCallback<bigint, TOutput>): Iterable<TOutput>;
+
+    // eslint-disable-next-line jsdoc/require-jsdoc -- Generic form of overloaded signatures.
+    forward<TInput extends number | bigint | Iterable<number | bigint>>(valueOrValues: TInput extends Iterable<number | bigint> ? TInput : number | bigint): TInput extends Iterable<number | bigint> ? Iterable<bigint> : bigint;
+
+    // eslint-disable-next-line jsdoc/require-jsdoc -- Generic form of overloaded signatures.
+    forward<TInput extends number | bigint | Iterable<number | bigint>, TOutput>(valueOrValues: TInput extends Iterable<number | bigint> ? TInput : number | bigint, transformerCallback: IndexedCallback<bigint, TOutput>): TInput extends Iterable<number | bigint> ? Iterable<TOutput> : TOutput;
 
     // eslint-disable-next-line jsdoc/require-jsdoc -- Implementation of overloaded signatures.
-    forward<TTransformerInput extends TransformerInput<number | bigint>, TOutput>(valueOrValues: TTransformerInput, transformerCallback?: IndexedCallback<bigint, TOutput>): TransformerOutput<TTransformerInput, TOutput> {
-        // TODO Refactor type when https://github.com/microsoft/TypeScript/pull/56941 released.
-        let result: bigint | TOutput | Iterable<bigint> | Iterable<TOutput>;
+    forward<TOutput>(valueOrValues: number | bigint | Iterable<number | bigint>, transformerCallback?: IndexedCallback<bigint, TOutput>): bigint | TOutput | Iterable<bigint> | Iterable<TOutput> {
+        let result;
 
         if (typeof valueOrValues !== "object") {
             result = transformerCallback === undefined ? this.#validateDoForward(valueOrValues) : this.#validateDoForwardCallback(transformerCallback, valueOrValues);
@@ -251,8 +248,7 @@ export abstract class Transformer {
             result = transformerCallback === undefined ? mapIterable(valueOrValues, value => this.#validateDoForward(value)) : mapIterable(valueOrValues, (value, index) => this.#validateDoForwardCallback(transformerCallback, value, index));
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type determination is handled above.
-        return result as TransformerOutput<TTransformerInput, TOutput>;
+        return result;
     }
 
     /**

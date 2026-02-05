@@ -3,7 +3,7 @@ import type { IndexedCallback } from "./iterable-utility.js";
 import { i18nextUtility } from "./locale/i18n.js";
 import { RegExpValidator } from "./reg-exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
-import { Transformer, type TransformerInput, type TransformerOutput } from "./transformer.js";
+import { Transformer } from "./transformer.js";
 
 /**
  * Character set validation parameters.
@@ -177,8 +177,8 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
      * @param exclusion
      * Exclusion.
      */
-    protected validateExclusion(exclusion: Exclusion): void {
-        if (exclusion !== Exclusions.None && !this.#exclusionSupport.includes(exclusion)) {
+    protected validateExclusion(exclusion: Exclusion | undefined): void {
+        if (exclusion !== undefined && exclusion !== Exclusions.None && !this.#exclusionSupport.includes(exclusion)) {
             throw new RangeError(i18nextUtility.t("CharacterSetValidator.exclusionNotSupported", {
                 exclusion
             }));
@@ -513,40 +513,67 @@ export class CharacterSetCreator extends CharacterSetValidator {
     }
 
     /**
-     * Create string(s) by mapping value(s) to the equivalent characters in the character set across the length of the
-     * string.
-     *
-     * @template TTransformerInput
-     * Transformer input type.
+     * Create a string by mapping a value to the equivalent characters in the character set across the required string
+     * length.
      *
      * @param length
      * Required string length.
      *
-     * @param valueOrValues
-     * Numeric value(s) of the string(s).
+     * @param value
+     * Numeric value of the string.
      *
      * @param exclusion
-     * String(s) to be excluded from the range of outputs. See {@linkcode Exclusions} for possible values and their
-     * meaning.
+     * Strings to be excluded from the output range. See {@linkcode Exclusions} for possible values and their meanings.
      *
      * @param tweak
-     * If provided, the numerical value of the string(s) is/are "tweaked" using an {@link EncryptionTransformer |
-     * encryption transformer}.
+     * If provided, the numeric value of the string is "tweaked" using an {@link EncryptionTransformer | encryption
+     * transformer}.
      *
      * @param creatorCallback
-     * If provided, called after each string is constructed to create the final value.
+     * Called after the string is constructed to create the final value.
      *
      * @returns
-     * String(s) created from the value(s).
+     * String created from the value.
      */
-    create<TTransformerInput extends TransformerInput<number | bigint>>(length: number, valueOrValues: TTransformerInput, exclusion: Exclusion = Exclusions.None, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): TransformerOutput<TTransformerInput, string> {
+    create(length: number, value: number | bigint, exclusion?: Exclusion, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): string;
+
+    /**
+     * Create strings by mapping values to the equivalent characters in the character set across the required string
+     * length.
+     *
+     * @param length
+     * Required string length.
+     *
+     * @param values
+     * Numeric values of the string.
+     *
+     * @param exclusion
+     * Strings to be excluded from the output range. See {@linkcode Exclusions} for possible values and their meanings.
+     *
+     * @param tweak
+     * If provided, the numeric value of each string is "tweaked" using an {@link EncryptionTransformer | encryption
+     * transformer}.
+     *
+     * @param creatorCallback
+     * Called after each string is constructed to create the final value.
+     *
+     * @returns
+     * Strings created from the values.
+     */
+    create(length: number, values: Iterable<number | bigint>, exclusion?: Exclusion, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): Iterable<string>;
+
+    // eslint-disable-next-line jsdoc/require-jsdoc -- Generic form of overloaded signatures.
+    create<TInput extends number | bigint | Iterable<number | bigint>>(length: number, valueOrValues: TInput extends Iterable<number | bigint> ? TInput : number | bigint, exclusion?: Exclusion, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): TInput extends Iterable<number | bigint> ? Iterable<string> : string;
+
+    // eslint-disable-next-line jsdoc/require-jsdoc -- Implementation of overloaded signatures.
+    create(length: number, valueOrValues: number | bigint | Iterable<number | bigint>, exclusion?: Exclusion, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): string | Iterable<string> {
         this.#validateLength(length);
         this.validateExclusion(exclusion);
 
         // Zero value in ternary else obviates need for non-null assertion.
         const allZerosValue = exclusion === Exclusions.AllNumeric ? this.#allZerosValues[length] : 0n;
 
-        const transformer = Transformer.get(this.#exclusionDomains[exclusion][length], tweak);
+        const transformer = Transformer.get(this.#exclusionDomains[exclusion ?? Exclusions.None][length], tweak);
 
         return transformer.forward(valueOrValues, (transformedValue, index) => {
             let s = "";
@@ -585,7 +612,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * String.
      *
      * @param exclusion
-     * Strings excluded from the range of inputs. See {@linkcode Exclusions} for possible values and their meaning.
+     * Strings excluded from the input domain. See {@linkcode Exclusions} for possible values and their meanings.
      *
      * @param tweak
      * If provided, the numerical value of the string was "tweaked" using an {@link EncryptionTransformer | encryption
@@ -594,7 +621,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
      * @returns
      * Numeric value of the string.
      */
-    valueFor(s: string, exclusion: Exclusion = Exclusions.None, tweak?: number | bigint): bigint {
+    valueFor(s: string, exclusion?: Exclusion, tweak?: number | bigint): bigint {
         const length = s.length;
 
         this.#validateLength(length);
@@ -639,7 +666,7 @@ export class CharacterSetCreator extends CharacterSetValidator {
             }
         }
 
-        return Transformer.get(this.#exclusionDomains[exclusion][length], tweak).reverse(value);
+        return Transformer.get(this.#exclusionDomains[exclusion ?? Exclusions.None][length], tweak).reverse(value);
     }
 }
 
