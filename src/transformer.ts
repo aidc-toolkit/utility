@@ -322,6 +322,11 @@ export class IdentityTransformer extends Transformer {
  */
 export class EncryptionTransformer extends Transformer {
     /**
+     * Encryption seed; an 8-digit prime to force at least four rounds.
+     */
+    static readonly #SEED = 603868999n;
+
+    /**
      * Individual bits, pre-calculated for performance.
      */
     static readonly #BITS = new Uint8Array([
@@ -391,8 +396,8 @@ export class EncryptionTransformer extends Transformer {
         const bits: number[] = [];
         const inverseBits: number[] = [];
 
-        // Key is the product of domain, tweak, and an 8-digit prime to force at least four rounds.
-        for (let reducedKey = this.domain * BigInt(tweak) * 603868999n; reducedKey !== 0n; reducedKey >>= 8n) {
+        // Key is the product of domain, tweak, and seed.
+        for (let reducedKey = this.domain * BigInt(tweak) * EncryptionTransformer.#SEED; reducedKey !== 0n; reducedKey >>= 8n) {
             // Extract the least significant byte.
             xorBytes.unshift(Number(BigInt.asUintN(8, reducedKey)));
 
