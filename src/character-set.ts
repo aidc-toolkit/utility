@@ -88,9 +88,9 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
 
         const characterSetMap = new Map<string, number>();
 
-        characterSet.forEach((c, index) => {
+        for (const [index, c] of characterSet.entries()) {
             characterSetMap.set(c, index);
-        });
+        }
 
         this.#characterSetMap = characterSetMap;
 
