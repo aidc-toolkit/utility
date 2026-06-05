@@ -29,10 +29,10 @@
     "test": "tsc --project tsconfig-test.json --noEmit && vitest run"
   },
   "devDependencies": {
-    "@aidc-toolkit/dev": "^1.0.46",
-    "vitest": "^4.0.18"
+    "@aidc-toolkit/dev": "^1.0.47-alpha",
+    "vitest": "^4.1.8"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "^1.0.47"
+    "@aidc-toolkit/core": "^1.0.48-alpha"
   }
 }
