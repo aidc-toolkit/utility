@@ -504,27 +504,27 @@ export class EncryptionTransformer extends Transformer {
 
         const bit = this.#bits[round];
 
-        bytes.forEach((byte, index) => {
+        for (const [index, byte] of bytes.entries()) {
             const determinant = byte & bit;
 
             determinants[index] = determinant;
 
             // Place byte in array chosen by bit state.
             (determinant !== 0 ? shuffleIndexes1 : shuffleIndexes0).push(index);
-        });
+        }
 
         const inverseBit = this.#inverseBits[round];
 
         const shuffleBytes = new Uint8Array(bytesLength);
 
         // Concatenate shuffle indexes arrays and complete shuffle.
-        [...shuffleIndexes1, ...shuffleIndexes0].forEach((shuffleIndex, index) => {
+        for (const [index, shuffleIndex] of [...shuffleIndexes1, ...shuffleIndexes0].entries()) {
             if (forward) {
                 shuffleBytes[index] = (bytes[shuffleIndex] & inverseBit) | determinants[index];
             } else {
                 shuffleBytes[shuffleIndex] = (bytes[index] & inverseBit) | determinants[shuffleIndex];
             }
-        });
+        }
 
         return shuffleBytes;
     }

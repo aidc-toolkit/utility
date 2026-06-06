@@ -25,10 +25,10 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
         });
 
         test("Character set", () => {
-            characterSetCreator.characterSet.forEach((c, index) => {
+            for (const [index, c] of characterSetCreator.characterSet.entries()) {
                 expect(c).not.toBeUndefined();
                 expect(characterSetCreator.characterIndex(c)).toBe(index);
-            });
+            }
 
             let s = "";
 
@@ -47,9 +47,9 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
 
             expect(characterIndexes.length).toBe(characterSetSize);
 
-            characterIndexes.forEach((characterIndex, index) => {
+            for (const [index, characterIndex] of characterIndexes.entries()) {
                 expect(characterIndex).toBe(index);
-            });
+            }
 
             expect(characterSetCreator.exclusionSupport.includes(Exclusions.FirstZero)).toBe(excludeFirstZero);
             expect(characterSetCreator.exclusionSupport.includes(Exclusions.AllNumeric)).toBe(excludeAllNumeric);
