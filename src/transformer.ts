@@ -217,13 +217,10 @@ export abstract class Transformer {
      */
     forward<TOutput>(values: Iterable<number | bigint>, transformerCallback: IndexedCallback<bigint, TOutput>): Iterable<TOutput>;
 
-    // eslint-disable-next-line jsdoc/require-jsdoc -- Generic form of overloaded signatures.
     forward<TInput extends number | bigint | Iterable<number | bigint>>(valueOrValues: TInput extends Iterable<number | bigint> ? TInput : number | bigint): TInput extends Iterable<number | bigint> ? Iterable<bigint> : bigint;
 
-    // eslint-disable-next-line jsdoc/require-jsdoc -- Generic form of overloaded signatures.
     forward<TInput extends number | bigint | Iterable<number | bigint>, TOutput>(valueOrValues: TInput extends Iterable<number | bigint> ? TInput : number | bigint, transformerCallback: IndexedCallback<bigint, TOutput>): TInput extends Iterable<number | bigint> ? Iterable<TOutput> : TOutput;
 
-    // eslint-disable-next-line jsdoc/require-jsdoc -- Implementation of overloaded signatures.
     forward<TOutput>(valueOrValues: number | bigint | Iterable<number | bigint>, transformerCallback?: IndexedCallback<bigint, TOutput>): bigint | TOutput | Iterable<bigint> | Iterable<TOutput> {
         let result;
 
