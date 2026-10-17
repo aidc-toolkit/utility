@@ -562,10 +562,8 @@ export class CharacterSetCreator extends CharacterSetValidator {
      */
     create(length: number, values: Iterable<number | bigint>, exclusion?: Exclusion, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): Iterable<string>;
 
-    // eslint-disable-next-line jsdoc/require-jsdoc -- Generic form of overloaded signatures.
     create<TInput extends number | bigint | Iterable<number | bigint>>(length: number, valueOrValues: TInput extends Iterable<number | bigint> ? TInput : number | bigint, exclusion?: Exclusion, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): TInput extends Iterable<number | bigint> ? Iterable<string> : string;
 
-    // eslint-disable-next-line jsdoc/require-jsdoc -- Implementation of overloaded signatures.
     create(length: number, valueOrValues: number | bigint | Iterable<number | bigint>, exclusion?: Exclusion, tweak?: number | bigint, creatorCallback?: IndexedCallback<string, string>): string | Iterable<string> {
         this.#validateLength(length);
         this.validateExclusion(exclusion);
