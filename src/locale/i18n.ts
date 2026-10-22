@@ -1,12 +1,20 @@
-import { i18nCoreInit, i18nInit, type I18nLanguageDetector } from "@aidc-toolkit/core";
-import i18next, { type i18n, type Resource } from "i18next";
+import { i18nCoreInit, i18nextInstance, i18nInit, type I18nLanguageDetector } from "@aidc-toolkit/core";
+import type { ParseKeys, Resource } from "i18next";
 import enLocaleResources from "./en/locale-resources.js";
 import frLocaleResources from "./fr/locale-resources.js";
 
+/**
+ * Utility namespace.
+ */
 export const utilityNS = "aidct_utility";
 
 /**
- * Locale strings type is extracted from the English locale strings object.
+ * Utility parse keys.
+ */
+export type UtilityParseKeys = ParseKeys<typeof utilityNS>;
+
+/**
+ * Locale resources type is extracted from the English locale strings object.
  */
 export type UtilityLocaleResources = typeof enLocaleResources;
 
@@ -22,8 +30,10 @@ export const utilityResourceBundle: Resource = {
     }
 };
 
-// Explicit type is necessary because type can't be inferred without additional references.
-export const i18nextUtility: i18n = i18next.createInstance();
+/**
+ * Utility i18next translator function.
+ */
+export const i18nextUtilityT = i18nextInstance.getFixedT(null, utilityNS);
 
 /**
  * Initialize internationalization.
@@ -38,5 +48,5 @@ export const i18nextUtility: i18n = i18next.createInstance();
  * Utility resource bundle.
  */
 export async function i18nUtilityInit(languageDetector: I18nLanguageDetector, debug = false): Promise<Resource> {
-    return i18nInit(i18nextUtility, languageDetector, debug, utilityNS, utilityResourceBundle, i18nCoreInit);
+    return i18nInit(languageDetector, debug, utilityResourceBundle, i18nCoreInit);
 }
