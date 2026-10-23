@@ -2,6 +2,11 @@
   "name": "@aidc-toolkit/utility",
   "version": "2.0.0-alpha",
   "description": "Foundational utilities for AIDC Toolkit",
+  "keywords": [
+    "aidc",
+    "barcode",
+    "rfid"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "homepage": "https://aidc-toolkit.com",
