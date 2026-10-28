@@ -41,10 +41,10 @@ function testTransformer(domain: number, tweak?: number, callback?: (value: bigi
 
     expect(Array.from(transformer.forward(randomValues))).toStrictEqual(transformedRandomValues);
 
-    expect(() => transformer.forward(domain)).toThrow(`Value ${domain} must be less than ${domain}`);
+    expect(() => transformer.forward(domain)).toThrow(`Value ${domain.toLocaleString()} must be less than ${domain.toLocaleString()}`);
     expect(() => transformer.forward(new Sequence(domain, 0))).not.toThrow(RangeError);
     expect(() => transformer.forward(new Sequence(domain - 1, 1))).not.toThrow(RangeError);
-    expect(() => transformer.forward(new Sequence(domain, 1))).toThrow(`Maximum value ${domain} must be less than ${domain}`);
+    expect(() => transformer.forward(new Sequence(domain, 1))).toThrow(`Maximum value ${domain.toLocaleString()} must be less than ${domain.toLocaleString()}`);
     expect(() => transformer.forward(new Sequence(0, -1))).not.toThrow(RangeError);
     expect(() => transformer.forward(new Sequence(-1, -1))).toThrow("Minimum value -1 must be greater than or equal to 0");
 }
