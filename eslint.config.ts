@@ -1,3 +1,3 @@
-import { esLintDefineAIDCToolkitConfig, ESLintProfiles } from "@aidc-toolkit/dev";
+import { esLintConfigAIDCToolkit } from "@aidc-toolkit/dev";
 
-export default esLintDefineAIDCToolkitConfig(ESLintProfiles.Test);
+export default esLintConfigAIDCToolkit;
