@@ -1,3 +1,4 @@
+import { DEFAULT_LANGUAGE } from "@aidc-toolkit/core";
 import { describe, expect, test } from "vitest";
 import {
     ALPHABETIC_CREATOR,
@@ -96,7 +97,7 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
 
             expect(index).toBe(domain);
 
-            expect(() => characterSetCreator.create(length, domain, exclusion)).toThrow(`Value ${domain} must be less than ${domain}`);
+            expect(() => characterSetCreator.create(length, domain, exclusion)).toThrow(`Value ${domain.toLocaleString(DEFAULT_LANGUAGE)} must be less than ${domain.toLocaleString(DEFAULT_LANGUAGE)}`);
 
             const sparseSequence = characterSetCreator.create(length, new Sequence(domain - 1, -domain), exclusion, 123456n);
 
@@ -142,7 +143,7 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
             expect(Array.from(characterSetCreator.create(length, randomValues, exclusion))).toStrictEqual(straightRandomValues);
             expect(Array.from(characterSetCreator.create(length, randomValues, exclusion, 123456n))).toStrictEqual(sparseRandomValues);
 
-            expect(() => characterSetCreator.create(length, domain, exclusion, 123456n)).toThrow(`Value ${domain} must be less than ${domain}`);
+            expect(() => characterSetCreator.create(length, domain, exclusion, 123456n)).toThrow(`Value ${domain.toLocaleString(DEFAULT_LANGUAGE)} must be less than ${domain.toLocaleString(DEFAULT_LANGUAGE)}`);
         }
 
         test("Length", () => {
