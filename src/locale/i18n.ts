@@ -9,24 +9,39 @@ import frLocaleResources from "./fr/locale-resources.js";
 export const utilityNS = "aidct_utility";
 
 /**
- * Utility parse keys.
- */
-export type UtilityParseKeys = ParseKeys<typeof utilityNS>;
-
-/**
  * Locale resources type is extracted from the English locale resources object.
  */
 export type UtilityLocaleResources = typeof enLocaleResources;
+
+/**
+ * Core locale resources augmentation.
+ */
+declare module "@aidc-toolkit/core" {
+    /**
+     * Internationalization locale resources.
+     */
+    export interface I18nLocaleResources {
+        /**
+         * Utility locale resources.
+         */
+        [utilityNS]: UtilityLocaleResources;
+    }
+}
+
+/**
+ * Utility parse keys.
+ */
+export type UtilityParseKeys = ParseKeys<typeof utilityNS>;
 
 /**
  * Utility resource bundle.
  */
 export const utilityResourceBundle: Resource = {
     en: {
-        aidct_utility: enLocaleResources
+        [utilityNS]: enLocaleResources
     },
     fr: {
-        aidct_utility: frLocaleResources
+        [utilityNS]: frLocaleResources
     }
 };
 
