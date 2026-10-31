@@ -1,4 +1,4 @@
-import { i18nextUtilityT } from "./locale/i18n.js";
+import { i18nextUtility } from "./locale/i18n.js";
 import type { StringValidator } from "./string.js";
 
 /**
@@ -44,7 +44,7 @@ export class RegExpValidator implements StringValidator {
      * Error message.
      */
     protected createErrorMessage(s: string): string {
-        return i18nextUtilityT("RegExpValidator.stringDoesNotMatchPattern", {
+        return i18nextUtility.t("RegExpValidator.stringDoesNotMatchPattern", {
             s
         });
     }

@@ -3,9 +3,6 @@ import type { i18n, ParseKeys, Resource, TFunction } from "i18next";
 import enLocaleResources from "./en/locale-resources.js";
 import frLocaleResources from "./fr/locale-resources.js";
 
-/**
- * Utility namespace.
- */
 export const utilityNS = "aidct_utility";
 
 /**
