@@ -1,5 +1,5 @@
-import { i18nCoreInit, i18nextInstance, i18nInit, type I18nLanguageDetector } from "@aidc-toolkit/core";
-import type { ParseKeys, Resource } from "i18next";
+import { i18nCoreInit, i18nInit } from "@aidc-toolkit/core";
+import type { i18n, ParseKeys, Resource, TFunction } from "i18next";
 import enLocaleResources from "./en/locale-resources.js";
 import frLocaleResources from "./fr/locale-resources.js";
 
@@ -14,7 +14,7 @@ export const utilityNS = "aidct_utility";
 export type UtilityParseKeys = ParseKeys<typeof utilityNS>;
 
 /**
- * Locale resources type is extracted from the English locale strings object.
+ * Locale resources type is extracted from the English locale resources object.
  */
 export type UtilityLocaleResources = typeof enLocaleResources;
 
@@ -33,13 +33,13 @@ export const utilityResourceBundle: Resource = {
 /**
  * Utility i18next translator function.
  */
-export const i18nextUtilityT = i18nextInstance.getFixedT(null, utilityNS);
+export let i18nextUtilityT: TFunction<typeof utilityNS>;
 
 /**
  * Initialize internationalization.
  *
- * @param languageDetector
- * Language detector.
+ * @param i18next
+ * Internationalization instance.
  *
  * @param debug
  * Debug setting.
@@ -47,6 +47,9 @@ export const i18nextUtilityT = i18nextInstance.getFixedT(null, utilityNS);
  * @returns
  * Utility resource bundle.
  */
-export async function i18nUtilityInit(languageDetector: I18nLanguageDetector, debug = false): Promise<Resource> {
-    return i18nInit(languageDetector, debug, utilityResourceBundle, i18nCoreInit);
+export async function i18nUtilityInit(i18next: i18n, debug = false): Promise<Resource> {
+    // Bind translator function to i18next.
+    i18nextUtilityT = i18next.getFixedT(null, utilityNS);
+
+    return i18nInit(i18next, debug, utilityResourceBundle, i18nCoreInit);
 }
