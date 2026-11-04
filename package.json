@@ -1,6 +1,6 @@
 {
   "name": "@aidc-toolkit/utility",
-  "version": "1.0.53-beta",
+  "version": "1.0.53",
   "description": "Foundational utilities for AIDC Toolkit",
   "type": "module",
   "main": "dist/index.js",
@@ -33,6 +33,6 @@
     "vitest": "^4.1.12"
   },
   "dependencies": {
-    "@aidc-toolkit/core": "1.0.52-beta"
+    "@aidc-toolkit/core": "^1.0.52"
   }
 }
