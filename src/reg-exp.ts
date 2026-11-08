@@ -27,7 +27,7 @@ export class RegExpValidator implements StringValidator {
     }
 
     /**
-     * Get the regular expression.
+     * Regular expression.
      */
     get regExp(): RegExp {
         return this.#regExp;

@@ -59,35 +59,35 @@ export class Sequence implements Iterable<bigint> {
     }
 
     /**
-     * Get the start value (inclusive).
+     * Start value (inclusive).
      */
     get startValue(): bigint {
         return this.#startValue;
     }
 
     /**
-     * Get the end value (exclusive).
+     * End value (exclusive).
      */
     get endValue(): bigint {
         return this.#endValue;
     }
 
     /**
-     * Get the count of values.
+     * Count of values.
      */
     get count(): number {
         return this.#count;
     }
 
     /**
-     * Get the minimum value (inclusive).
+     * Minimum value (inclusive).
      */
     get minimumValue(): bigint {
         return this.#minimumValue;
     }
 
     /**
-     * Get the maximum value (inclusive).
+     * Maximum value (inclusive).
      */
     get maximumValue(): bigint {
         return this.#maximumValue;

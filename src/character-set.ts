@@ -98,21 +98,21 @@ export class CharacterSetValidator implements StringValidator<CharacterSetValida
     }
 
     /**
-     * Get the character set.
+     * Character set.
      */
     get characterSet(): readonly string[] {
         return this.#characterSet;
     }
 
     /**
-     * Get the character set size.
+     * Character set size.
      */
     get characterSetSize(): number {
         return this.#characterSet.length;
     }
 
     /**
-     * Get the exclusions supported by the character set.
+     * Exclusions supported by the character set.
      */
     get exclusionSupport(): readonly Exclusion[] {
         return this.#exclusionSupport;

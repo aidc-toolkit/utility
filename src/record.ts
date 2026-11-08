@@ -34,14 +34,14 @@ export class RecordValidator<T> implements StringValidator {
     }
 
     /**
-     * Get the type name.
+     * Type name for error message.
      */
     get typeName(): string {
         return this.#typeName;
     }
 
     /**
-     * Get the record.
+     * Record in which to look up keys.
      */
     get record(): Readonly<Record<string, T>> {
         return this.#record;

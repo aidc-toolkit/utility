@@ -85,7 +85,7 @@ export abstract class Transformer {
     }
 
     /**
-     * Get the domain.
+     * Domain.
      */
     get domain(): bigint {
         return this.#domain;
