@@ -680,7 +680,7 @@ export const NUMERIC_CREATOR = new CharacterSetCreator([
 /**
  * Numeric validator. Character set is 0-9. Supports {@linkcode Exclusions.FirstZero}.
  */
-export const NUMERIC_VALIDATOR = NUMERIC_CREATOR as CharacterSetValidator;
+export const NUMERIC_VALIDATOR: CharacterSetValidator = NUMERIC_CREATOR;
 
 /**
  * Hexadecimal creator. Character set is 0-9, A-F. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
@@ -695,7 +695,7 @@ export const HEXADECIMAL_CREATOR = new CharacterSetCreator([
  * Hexadecimal validator. Character set is 0-9, A-F. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
  * Exclusions.AllNumeric}.
  */
-export const HEXADECIMAL_VALIDATOR = HEXADECIMAL_CREATOR as CharacterSetValidator;
+export const HEXADECIMAL_VALIDATOR: CharacterSetValidator = HEXADECIMAL_CREATOR;
 
 /**
  * Alphabetic creator. Character set is A-Z.
@@ -708,7 +708,7 @@ export const ALPHABETIC_CREATOR = new CharacterSetCreator([
 /**
  * Alphabetic validator. Character set is A-Z.
  */
-export const ALPHABETIC_VALIDATOR = ALPHABETIC_CREATOR as CharacterSetValidator;
+export const ALPHABETIC_VALIDATOR: CharacterSetValidator = ALPHABETIC_CREATOR;
 
 /**
  * Alphanumeric creator. Character set is 0-9, A-Z. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
@@ -724,6 +724,6 @@ export const ALPHANUMERIC_CREATOR = new CharacterSetCreator([
  * Alphanumeric validator. Character set is 0-9, A-Z. Supports {@linkcode Exclusions.FirstZero} and {@linkcode
  * Exclusions.AllNumeric}.
  */
-export const ALPHANUMERIC_VALIDATOR = ALPHANUMERIC_CREATOR as CharacterSetValidator;
+export const ALPHANUMERIC_VALIDATOR: CharacterSetValidator = ALPHANUMERIC_CREATOR;
 
 /* eslint-enable @stylistic/list-style */

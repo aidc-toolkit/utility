@@ -43,7 +43,7 @@ export const utilityResourceBundle: Resource = {
     fr: {
         [utilityNS]: frLocaleResources
     }
-};
+} as const;
 
 /**
  * Utility i18next translator function.
