@@ -11,7 +11,7 @@
  * Input value.
  *
  * @param index
- * Index in iterable or undefined for single mapping).
+ * Index in iterable or undefined for single mapping.
  *
  * @returns
  * Output value.

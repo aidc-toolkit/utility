@@ -1,4 +1,4 @@
-import { type IndexedCallback, mapIterable } from "./iterable-utility.js";
+import { type IndexedCallback, mapIterable } from "./map-iterable.js";
 import { i18nextUtilityT } from "./locale/i18n.js";
 import { Sequence } from "./sequence.js";
 

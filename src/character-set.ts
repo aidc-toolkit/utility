@@ -1,5 +1,5 @@
 import { type Exclusion, Exclusions } from "./exclusion.js";
-import type { IndexedCallback } from "./iterable-utility.js";
+import type { IndexedCallback } from "./map-iterable.js";
 import { i18nextUtilityT } from "./locale/i18n.js";
 import { RegExpValidator } from "./reg-exp.js";
 import type { StringValidation, StringValidator } from "./string.js";
