@@ -193,24 +193,29 @@ function testCharacterSet<T extends CharacterSetValidator>(name: string, charact
 
 describe("Exclusion", () => {
     test("First zero", () => {
-        expect(() => new CharacterSetCreator([
-            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
-        ], Exclusions.FirstZero)).not.toThrow(RangeError);
-        expect(() => new CharacterSetCreator([
-            "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"
-        ], Exclusions.FirstZero)).toThrow("Character set must support zero as first character");
+        expect(() => new CharacterSetCreator(
+            ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+            Exclusions.FirstZero
+        )).not.toThrow(RangeError);
+        expect(() => new CharacterSetCreator(
+            ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+            Exclusions.FirstZero
+        )).toThrow("Character set must support zero as first character");
     });
 
     test("All numeric", () => {
-        expect(() => new CharacterSetCreator([
-            "!", "#", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D"
-        ], Exclusions.AllNumeric)).not.toThrow(RangeError);
-        expect(() => new CharacterSetCreator([
-            "!", "#", "/", "0", "1", "2", "3", "A", "B", "C", "D"
-        ], Exclusions.AllNumeric)).toThrow("Character set must support all numeric characters in sequence");
-        expect(() => new CharacterSetCreator([
-            "!", "#", "/", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D"
-        ], Exclusions.AllNumeric)).toThrow("Character set must support all numeric characters in sequence");
+        expect(() => new CharacterSetCreator(
+            ["!", "#", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D"],
+            Exclusions.AllNumeric
+        )).not.toThrow(RangeError);
+        expect(() => new CharacterSetCreator(
+            ["!", "#", "/", "0", "1", "2", "3", "A", "B", "C", "D"],
+            Exclusions.AllNumeric
+        )).toThrow("Character set must support all numeric characters in sequence");
+        expect(() => new CharacterSetCreator(
+            ["!", "#", "/", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D"],
+            Exclusions.AllNumeric
+        )).toThrow("Character set must support all numeric characters in sequence");
     });
 });
 
@@ -219,10 +224,9 @@ testCharacterSet("Hexadecimal", HEXADECIMAL_CREATOR, HEXADECIMAL_VALIDATOR, 16, 
 testCharacterSet("Alphabetic", ALPHABETIC_CREATOR, ALPHABETIC_VALIDATOR, 26, 3, false, false);
 testCharacterSet("Alphanumeric", ALPHANUMERIC_CREATOR, ALPHANUMERIC_VALIDATOR, 36, 3, true, true);
 
-const middleNumericCreator = new CharacterSetCreator([
-    "(", ")",
-    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "<", ">"
-], Exclusions.AllNumeric);
+const middleNumericCreator = new CharacterSetCreator(
+    ["(", ")", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "<", ">"],
+    Exclusions.AllNumeric
+);
 
 testCharacterSet("Middle numeric", middleNumericCreator, middleNumericCreator as CharacterSetValidator, 14, 4, false, true);

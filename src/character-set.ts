@@ -668,6 +668,8 @@ export class CharacterSetCreator extends CharacterSetValidator {
     }
 }
 
+/* eslint-disable @stylistic/list-style -- Arrays formatted for readability. */
+
 /**
  * Numeric creator. Character set is 0-9. Supports {@linkcode Exclusions.FirstZero}.
  */
@@ -723,3 +725,5 @@ export const ALPHANUMERIC_CREATOR = new CharacterSetCreator([
  * Exclusions.AllNumeric}.
  */
 export const ALPHANUMERIC_VALIDATOR = ALPHANUMERIC_CREATOR as CharacterSetValidator;
+
+/* eslint-enable @stylistic/list-style */

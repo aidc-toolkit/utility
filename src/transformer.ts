@@ -326,16 +326,16 @@ export class EncryptionTransformer extends Transformer {
     /**
      * Individual bits, pre-calculated for performance.
      */
-    static readonly #BITS = new Uint8Array([
-        0b00000001, 0b00000010, 0b00000100, 0b00001000, 0b00010000, 0b00100000, 0b01000000, 0b10000000
-    ]);
+    static readonly #BITS = new Uint8Array(
+        [0b00000001, 0b00000010, 0b00000100, 0b00001000, 0b00010000, 0b00100000, 0b01000000, 0b10000000]
+    );
 
     /**
      * Inverse individual bits, pre-calculated for performance.
      */
-    static readonly #INVERSE_BITS = new Uint8Array([
-        0b11111110, 0b11111101, 0b11111011, 0b11110111, 0b11101111, 0b11011111, 0b10111111, 0b01111111
-    ]);
+    static readonly #INVERSE_BITS = new Uint8Array(
+        [0b11111110, 0b11111101, 0b11111011, 0b11110111, 0b11101111, 0b11011111, 0b10111111, 0b01111111]
+    );
 
     /**
      * Number of bytes covered by the domain.
